@@ -13,6 +13,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::view('/', 'items.index');
+Route::view('/item', 'items.show');
+Route::view('/sell', 'items.create');
+Route::view('/purchase', 'purchases.create');
+Route::view('/purchase/address', 'purchases.address');
+Route::view('/purchases.create', 'purchases.create');
+Route::view('/mypage/profile', 'users.edit');
+Route::view('/mypage', 'users.show');
+Route::view('/login', 'auth.login')->name('login');
+Route::view('/register', 'auth.register')->name('register');
+Route::view('/mypage', 'users.show');

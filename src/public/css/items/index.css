@@ -1,0 +1,31 @@
+.content__wrapper2 {
+    margin-top: 0px;
+}
+
+.tab {
+    display: flex;
+    padding-top: 50px;
+    border-bottom: solid 1px rgb(95, 95, 95);
+    width: 100%;
+    padding-left: 10%;
+    gap: 60px;
+    padding-bottom: 10px;
+}
+
+.tab__recommend,
+.tab__mylist {
+    font-size: 20px;
+    font-weight: bold;
+    color: rgb(95, 95, 95);
+}
+
+.product-image {
+    margin-top: 70px;
+    width: 200px;
+    height: 200px;
+    background-color: rgb(217, 217, 217);
+}
+
+.product-name {
+    font-size: 20px;
+}

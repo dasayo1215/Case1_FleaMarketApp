@@ -1,0 +1,63 @@
+.content__wrapper2 {
+    margin-top: 0px;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 50px;
+}
+
+.username {
+    margin-left: 50px;
+    margin-right: 200px;
+}
+
+.image-circle {
+    width: 100px;
+    height: 100px;
+    background-color: rgb(217,217,217);
+    border-radius: 50%;
+}
+
+.edit-profile {
+    text-decoration: none;
+    display: inline-block;
+    background-color: white;
+    color: rgb(255, 85, 85);
+    font-weight: bold;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 2px solid rgb(255, 85, 85);
+    font-size: 14px;
+}
+
+.tab {
+    display: flex;
+    padding-top: 50px;
+    border-bottom: solid 1px rgb(95, 95, 95);
+    width: 100%;
+    padding-left: 10%;
+    gap: 60px;
+    padding-bottom: 10px;
+}
+
+.tab__recommend,
+.tab__mylist {
+    font-size: 20px;
+    font-weight: bold;
+    color: rgb(95, 95, 95);
+}
+
+.product-image {
+    margin-top: 70px;
+    width: 200px;
+    height: 200px;
+    background-color: rgb(217, 217, 217);
+}
+
+.product-name {
+    font-size: 20px;
+}

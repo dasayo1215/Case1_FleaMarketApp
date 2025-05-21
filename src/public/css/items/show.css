@@ -1,0 +1,153 @@
+.item-content__wrapper {
+    margin: 0 auto;
+    width: 90%;
+    max-width: 1500px;
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    gap: 50px;
+}
+
+.image-square {
+    margin-top: 70px;
+    width: 300px;
+    height: 300px;
+    background-color: rgb(217, 217, 217);
+}
+
+.content__detail {
+    width: 300px;
+}
+
+.content__heading {
+    text-align: left;
+    margin-top: 50px;
+    margin-bottom: 0;
+}
+
+.content__brand {
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.content__price {
+    font-size: 16px;
+}
+
+.content__price-num {
+    font-size: 24px;
+}
+
+.content__like-comment {
+    margin-top: 10px;
+    display: flex;
+    gap: 30px;
+    padding-left: 30px;
+}
+
+.content__like,
+.content__comment {
+    width: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.content__like-img,
+.content__comment-img {
+    width: 100%;
+}
+
+.content__like-num,
+.content__comment-num {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.content__purchase-btn {
+    text-decoration: none;
+    background-color: rgb(255, 85, 85);
+    border-radius: 3px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
+    height: 40px;
+    margin: 15px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.info__title {
+    margin-bottom: 10px;
+}
+
+.detail__content,
+.info__table {
+    margin-bottom: 30px;
+}
+
+.info__table-tr {
+    height: 40px;
+}
+
+.info__table-th {
+    padding-right: 30px;
+}
+
+.td-category {
+    background-color: rgb(217, 217, 217);
+    padding: 0 20px;
+    border-radius: 9999px;
+}
+
+.td-state {
+    padding: 0 20px;
+}
+
+.comment__title {
+    color: rgb(95, 95, 95);
+    margin-bottom: 10px;
+}
+
+.comment__user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.comment__user-image {
+    width: 45px;
+    height: 45px;
+    background-color: rgb(217, 217, 217);
+    border-radius: 50%;
+}
+
+.comment__user-name {
+    font-weight: bold;
+}
+
+.comment__content {
+    margin-top: 10px;
+    background-color: rgb(217, 217, 217);
+    border-radius: 3px;
+    font-size: 14px;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.content-form__label {
+    margin-top: 30px;
+}
+
+.content-form__textarea {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.content-form__btn {
+    margin-top: 10px;
+}
