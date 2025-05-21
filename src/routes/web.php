@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Controllers\ItemController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,14 +18,27 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::view('/', 'items.index');
-Route::view('/item', 'items.show');
-Route::view('/sell', 'items.create');
-Route::view('/purchase', 'purchases.create');
-Route::view('/purchase/address', 'purchases.address');
-Route::view('/purchases.create', 'purchases.create');
-Route::view('/mypage/profile', 'users.edit');
-Route::view('/mypage', 'users.show');
-Route::view('/login', 'auth.login')->name('login');
-Route::view('/register', 'auth.register')->name('register');
-Route::view('/mypage', 'users.show');
+// こういうの、認証してたらこのボタン、してないならこのボタン、とかはmiddleware使わない？
+Route::get('/', [ItemController::class, 'index']);
+
+Route::get('/register', [RegisterController::class, 'showRegistrationForm']);
+Route::post('/register', [RegisterController::class, 'register'])->name('register');
+
+Route::get('/login', [LoginController::class, 'showLoginForm']);
+Route::post('/login', [LoginController::class, 'login'])->name('login');
+
+Route::get('/item/{item_id}', [ItemController::class, 'show']);
+Route::post('/item/{item_id}/comment', [ItemController::class, 'storeComment']);
+Route::post('/item/{item_id}/like', [ItemController::class, 'toggleLike']);
+
+// Route::middleware('auth')->group(function(){
+    Route::get('/purchase/{item_id}', [PurchaseController::class, 'showPurchaseForm']);
+    Route::post('/purchase/{item_id}', [PurchaseController::class, 'purchase']);
+    Route::get('/purchase/address/{item_id}', [PurchaseController::class, 'showAddressForm']);
+    Route::post('/purchase/address/{item_id}', [PurchaseController::class, 'updateAddress']);
+    Route::get('/sell', [ItemController::class, 'showSellForm']);
+    Route::post('/sell', [ItemController::class, 'store']);
+    Route::get('/mypage', [UserController::class, 'showProfile']);
+    Route::get('/mypage/profile', [UserController::class, 'editProfile']);
+    Route::patch('/mypage/profile', [UserController::class, 'updateProfile']);
+// });
