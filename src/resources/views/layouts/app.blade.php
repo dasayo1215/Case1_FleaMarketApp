@@ -42,10 +42,10 @@
                     @endguest
 
                     <li class="header-nav__item">
-                        <a class="header-nav__mypage" href="/">マイページ</a>
+                        <a class="header-nav__mypage" href="{{ route('mypage') }}">マイページ</a>
                     </li>
                     <li class="header-nav__item">
-                        <a class="header-nav__sale" href="/">出品</a>
+                        <a class="header-nav__sale" href="{{ route('sell') }}">出品</a>
                     </li>
                 </ul>
             @endif

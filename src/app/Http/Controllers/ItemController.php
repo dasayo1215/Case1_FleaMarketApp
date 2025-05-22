@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class ItemController extends Controller
@@ -10,7 +11,9 @@ class ItemController extends Controller
         $tab = $request->query('tab');
 
         if($tab === 'mylist'){
-            // /?tab=mylist
+            if(!Auth::check()){
+                return redirect('login'); //未認証ならログインページへ
+            }
             return $this->mylist();
         }else{
             return view('items.index');

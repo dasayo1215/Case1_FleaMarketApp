@@ -1,24 +1,20 @@
 @extends('layouts.app')
 
-@section('css')
-    {{-- <link rel="stylesheet" href="{{ asset('css/auth/login.css') }}"> --}}
-@endsection
-
 @section('content')
     <div class="content__wrapper">
         <h2 class="content__heading">ログイン</h2>
         <form class="content-form__form" action="/login" method="post">
             @csrf
             <label class="content-form__label" for="email">メールアドレス</label>
-            <input class="content-form__input" type="mail" name="email" id="email">
-            <p class="register-form__error-message">
+            <input class="content-form__input" type="text" name="email" id="email"  value="{{ old('email') }}">
+            <p class="content-form__error-message">
                 @error('email')
                     {{ $message }}
                 @enderror
             </p>
             <label class="content-form__label" for="password">パスワード</label>
             <input class="content-form__input" type="password" name="password" id="password">
-            <p class="register-form__error-message">
+            <p class="content-form__error-message">
                 @error('password')
                     {{ $message }}
                 @enderror

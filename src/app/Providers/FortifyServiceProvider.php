@@ -33,14 +33,6 @@ class FortifyServiceProvider extends ServiceProvider
         // デフォルトであった下記はプロフィール更新で使うかも？
         // Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
 
-        Fortify::registerView(function () {
-            return view('auth.register');
-        });
-
-        Fortify::loginView(function () {
-            return view('auth.login');
-        });
-
         RateLimiter::for('login', function (Request $request) {
             $email = (string) $request->email;
 

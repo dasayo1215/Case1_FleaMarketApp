@@ -2,6 +2,9 @@
     display: flex;
     align-items: center;
 	gap: 30px;
+}
+
+.image-error {
     margin-bottom: 50px;
 }
 
