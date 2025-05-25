@@ -20,9 +20,6 @@ class ItemController extends Controller
         $tab = $request->query('tab');
 
         if($tab === 'mylist'){
-            if(!Auth::check()){
-                return redirect('login'); //未認証ならログインページへ
-            }
             return $this->mylist();
         }
 
@@ -43,15 +40,17 @@ class ItemController extends Controller
         return view('items.index', compact('items'));
     }
 
-    public function mylist(){
-        if(!Auth::check()){
-            return redirect('login'); //未認証ならログインページへ
-        }
-        $user = Auth::user();
+    public function mylist()
+    {
+        $items = [];
 
-        $items = Product::whereHas('likes', function ($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })->with('likes')->latest()->get();
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            $items = Product::whereHas('likes', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->with('likes')->latest()->get();
+        }
 
         return view('items.index', compact('items'));
     }

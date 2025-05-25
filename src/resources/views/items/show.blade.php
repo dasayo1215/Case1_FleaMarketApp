@@ -21,27 +21,28 @@
                 </div>
                 <div class="content__like-comment">
                     @php
-                        $isLiked = $item->isLikedBy(Auth::user());
+                        $user = Auth::user();
+                        $isLiked = $user ? $item->isLikedBy($user) : false;
                         $likeCount = $item->likes->count();
                         $commentCount = $item->comments->count();
                     @endphp
                     <div class="content__like">
-                        @if (Auth::check())
+                        @auth
                             <form class="like-form" method="POST" action="{{ route('like', $item->id) }}">
                                 @csrf
                                 <button class="like-button" type="submit">
                                     <img class="content__like-img"
                                         src="{{ $isLiked ? asset('storage/assets/star-on.png') : asset('storage/assets/star-off.png') }}"
-                                        alt="いいね" style="cursor: pointer;">
+                                        alt="いいね">
                                 </button>
                             </form>
                         @else
                             {{-- ゲストユーザー：非アクティブ表示 --}}
                             <div class="like-button disabled">
-                                <img class="content__like-img" src="{{ asset('storage/assets/star-off.png') }}"
-                                    alt="いいね" style="cursor: not-allowed; opacity: 0.5;">
+                                <img class="content__like-img-guest" src="{{ asset('storage/assets/star-off.png') }}"
+                                    alt="いいね">
                             </div>
-                        @endif
+                        @endauth
                         <div class="content__like-num">{{ $likeCount }}</div>
                     </div>
                     <div class="content__comment">

@@ -27,8 +27,6 @@ Route::get('/login', [LoginController::class, 'showLoginForm']);
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 
 Route::get('/item/{item_id}', [ItemController::class, 'show']);
-Route::post('/item/{item_id}/comment', [ItemController::class, 'storeComment'])->name('comment');
-Route::post('/item/{item_id}/like', [ItemController::class, 'toggleLike'])->name('like');
 
 Route::middleware('auth')->group(function(){
     Route::get('/purchase/{item_id}', [PurchaseController::class, 'showPurchaseForm'])->name('purchase.show');
@@ -40,4 +38,6 @@ Route::middleware('auth')->group(function(){
     Route::get('/mypage', [UserController::class, 'showProfile'])->name('mypage');
     Route::get('/mypage/profile', [UserController::class, 'editProfile']);
     Route::patch('/mypage/profile', [UserController::class, 'updateProfile']);
+    Route::post('/item/{item_id}/comment', [ItemController::class, 'storeComment'])->name('comment');
+    Route::post('/item/{item_id}/like', [ItemController::class, 'toggleLike'])->name('like');
 });

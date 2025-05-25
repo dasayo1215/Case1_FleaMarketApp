@@ -59,10 +59,15 @@
 }
 
 .content__like-img,
-.content__comment-img {
+.content__comment-img,
+.content__like-img-guest {
     width: 30px;
     height: 30px;
     display: block;
+}
+
+.content__like-img {
+    cursor: pointer;
 }
 
 .content__like-num,
