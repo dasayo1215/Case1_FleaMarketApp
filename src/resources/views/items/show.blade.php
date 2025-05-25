@@ -6,51 +6,121 @@
 
 @section('content')
     <div class="item-content__wrapper">
-        <div class="image-square"></div>
+        <div class="image-container">
+            <img class="image-square" src="{{ asset('storage/products/' . $item->image_filename) }}"
+                alt="{{ $item->name }}"></img>
+            @if ($item->purchase && $item->purchase->completed_at !== null)
+                <div class="sold-label">sold</div>
+            @endif
+        </div>
         <div class="content__detail">
             <div class="content__heading">
-                <h2>商品名がここに入る</h2>
-                <div class="content__brand">ブランド名</div>
-                <div class=" content__price">￥ <span class="content__price-num">47,000</span>（税込）</div>
+                <h2 class="product-name">{{ $item->name }}</h2>
+                <div class="content__brand">{{ $item->brand }}</div>
+                <div class=" content__price">￥ <span class="content__price-num">{{ number_format($item->price) }}</span>（税込）
+                </div>
                 <div class="content__like-comment">
+                    @php
+                        $isLiked = $item->isLikedBy(Auth::user());
+                        $likeCount = $item->likes->count();
+                        $commentCount = $item->comments->count();
+                    @endphp
                     <div class="content__like">
-                        <img class="content__like-img" src="{{ asset('storage/assets/star-on.png') }}" alt="ロゴ">
-                        <div class="content__like-num">3</div>
+                        @if (Auth::check())
+                            <form class="like-form" method="POST" action="{{ route('like', $item->id) }}">
+                                @csrf
+                                <button class="like-button" type="submit">
+                                    <img class="content__like-img"
+                                        src="{{ $isLiked ? asset('storage/assets/star-on.png') : asset('storage/assets/star-off.png') }}"
+                                        alt="いいね" style="cursor: pointer;">
+                                </button>
+                            </form>
+                        @else
+                            {{-- ゲストユーザー：非アクティブ表示 --}}
+                            <div class="like-button disabled">
+                                <img class="content__like-img" src="{{ asset('storage/assets/star-off.png') }}"
+                                    alt="いいね" style="cursor: not-allowed; opacity: 0.5;">
+                            </div>
+                        @endif
+                        <div class="content__like-num">{{ $likeCount }}</div>
                     </div>
                     <div class="content__comment">
                         <img class="content__comment-img" src="{{ asset('storage/assets/bubble.png') }}" alt="ロゴ">
-                        <div class="content__comment-num">1</div>
+                        <div class="content__comment-num">{{ $commentCount }}</div>
                     </div>
                 </div>
             </div>
-            <a class="content__purchase-btn" href="/purchase">購入手続きへ</a>
+            @php
+                $purchase = $item->purchase;
+            @endphp
+            @if ($purchase)
+                @if (!is_null($purchase->completed_at))
+                    <div class="purchase-sold">Sold</div>
+                @elseif ($purchase->buyer_id !== $user->id)
+                    <div class="purchase-unavailable">他ユーザーが購入手続き中です</div>
+                @else
+                    <a class="content__purchase-btn" href="{{ url('/purchase/' . $item->id) }}">購入手続きを再開</a>
+                @endif
+            @else
+                <a class="content__purchase-btn" href="{{ url('/purchase/' . $item->id) }}">購入手続きへ</a>
+            @endif
 
-            <h3 class="info__title">商品説明</h3>
-            <div>カラー：グレー</div>
+            <h3 class="product-description">商品説明</h3>
+            <div>{{ $item->description }}</div>
 
-            <h3 class="info__title">商品の情報</h3>
+            <h3 class="product-info">商品の情報</h3>
             <table class="info__table">
-                <tr>
-                    <th class="info__table-th">カテゴリー</th>
-                    <td class="td-category">洋服</td>
+                <tr class="info__table-tr table-row1">
+                    <th class="info__table-th th-category">カテゴリー</th>
+                    <td class="td-category">
+                        @foreach ($item->categories as $category)
+                            <span class="td-category-span">{{ $category->name }}</span>
+                        @endforeach
+                    </td>
                 </tr>
                 <tr class="info__table-tr">
                     <th class="info__table-th">商品の状態</th>
-                    <td class="td-state">良好</td>
+                    <td class="td-state">{{ $item->productCondition->name }}</td>
                 </tr>
             </table>
 
-            <h3 class="comment__title">コメント(1)</h3>
-            <div class="comment__user">
-                <div class="comment__user-image"></div>
-                <div class="comment__user-name">admin</div>
-            </div>
-            <form action="/item" method="POST">
-                <div class="comment__content">ここにコメントが入る</div>
-                <label class="content-form__label" for="comment">商品へのコメント</label>
+            <h3 class="comment__title">コメント({{ $item->comments->count() }})</h3>
+            @foreach ($item->comments as $comment)
+                <div class="comment__user">
+                    <div class="user-image-container">
+                        @if ($comment->user->image_filename)
+                            <img class="comment__user-image"
+                                src="{{ asset('storage/users/' . $comment->user->image_filename) }}"
+                                alt="{{ $comment->user->image_filename }}" class="user-icon">
+                        @else
+                            <div class="comment__user-image"></div>
+                        @endif
+                    </div>
+                    <div class="comment__user-name">{{ $comment->user->name }}</div>
+                </div>
+                <div class="comment__content">{{ $comment->comment }}</div>
+            @endforeach
+
+            <label class="content-form__label" for="comment">商品へのコメント</label>
+            <form method="POST" action="{{ route('comment', $item->id) }}">
+                @csrf
                 <textarea class="content-form__textarea" name="comment" id="comment" cols="30" rows="10"></textarea>
-                <input class="content-form__btn" type="submit" value="コメントを送信する">
+                <p class="content-form__error-message">
+                    @error('comment')
+                        {{ $message }}
+                    @enderror
+                </p>
+                @if ($purchase)
+                    @if (!is_null($purchase->completed_at))
+                        <div class="comment-unavailable">売り切れのためコメントできません</div>
+                    @else
+                        <input class="content-form__btn" type="submit" value="コメントを送信する">
+                    @endif
+                @else
+                    <input class="content-form__btn" type="submit" value="コメントを送信する">
+                @endif
             </form>
+
         </div>
     </div>
 @endsection('content')

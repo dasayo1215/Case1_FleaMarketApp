@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// こういうの、認証してたらこのボタン、してないならこのボタン、とかはmiddleware使わない？
 Route::get('/', [ItemController::class, 'index']);
 
 Route::get('/register', [RegisterController::class, 'showRegistrationForm']);
@@ -28,11 +27,11 @@ Route::get('/login', [LoginController::class, 'showLoginForm']);
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 
 Route::get('/item/{item_id}', [ItemController::class, 'show']);
-Route::post('/item/{item_id}/comment', [ItemController::class, 'storeComment']);
-Route::post('/item/{item_id}/like', [ItemController::class, 'toggleLike']);
+Route::post('/item/{item_id}/comment', [ItemController::class, 'storeComment'])->name('comment');
+Route::post('/item/{item_id}/like', [ItemController::class, 'toggleLike'])->name('like');
 
-// Route::middleware('auth')->group(function(){
-    Route::get('/purchase/{item_id}', [PurchaseController::class, 'showPurchaseForm']);
+Route::middleware('auth')->group(function(){
+    Route::get('/purchase/{item_id}', [PurchaseController::class, 'showPurchaseForm'])->name('purchase.show');
     Route::post('/purchase/{item_id}', [PurchaseController::class, 'purchase']);
     Route::get('/purchase/address/{item_id}', [PurchaseController::class, 'showAddressForm']);
     Route::post('/purchase/address/{item_id}', [PurchaseController::class, 'updateAddress']);
@@ -41,4 +40,4 @@ Route::post('/item/{item_id}/like', [ItemController::class, 'toggleLike']);
     Route::get('/mypage', [UserController::class, 'showProfile'])->name('mypage');
     Route::get('/mypage/profile', [UserController::class, 'editProfile']);
     Route::patch('/mypage/profile', [UserController::class, 'updateProfile']);
-// });
+});

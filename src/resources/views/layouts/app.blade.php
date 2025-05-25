@@ -13,9 +13,9 @@
     <div class="app">
         <header class="header">
             <h1 class="sr-only">COACHTECH</h1>
-            <div class="header-logo">
+            <a class="header-logo" href="{{ url('/') }}">
                 <img class="header-logo__img" src="{{ asset('storage/assets/logo.svg') }}" alt="ロゴ">
-            </div>
+            </a>
             @if (!Route::is('login') && !Route::is('register'))
                 <ul class="header-nav">
                     <li class="header-nav__item">
@@ -25,20 +25,20 @@
                     </li>
 
                     @auth
-                    <li class="header-nav__item">
-                        <form class="header-nav__auth-form" action="/logout" method="post">
-                            @csrf
-                            <button class="header-nav__auth-btn">ログアウト</button>
-                        </form>
-                    </li>
+                        <li class="header-nav__item">
+                            <form class="header-nav__auth-form" action="/logout" method="post">
+                                @csrf
+                                <button class="header-nav__auth-btn">ログアウト</button>
+                            </form>
+                        </li>
                     @endauth
                     @guest
-                    <li class="header-nav__item">
-                        <form class="header-nav__auth-form" action="/logout" method="post">
-                            @csrf
-                            <a class="header-nav__auth-btn" href="{{ route('login') }}">ログイン</a>
-                        </form>
-                    </li>
+                        <li class="header-nav__item">
+                            <form class="header-nav__auth-form" action="/logout" method="post">
+                                @csrf
+                                <a class="header-nav__auth-btn" href="{{ route('login') }}">ログイン</a>
+                            </form>
+                        </li>
                     @endguest
 
                     <li class="header-nav__item">

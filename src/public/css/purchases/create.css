@@ -47,7 +47,8 @@
     border-top: solid 1px rgb(95, 95, 95);
 }
 
-.content-form__select {
+.content-form__select,
+.payment-method-error {
     margin-left: 50px;
     width: 50%;
 }
@@ -66,7 +67,8 @@
 }
 
 .postal-code,
-.address {
+.address,
+.address-group-error {
     padding-left: 50px;
 }
 
