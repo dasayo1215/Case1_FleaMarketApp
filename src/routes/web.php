@@ -6,6 +6,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [ItemController::class, 'index']);
+Route::get('/', [ItemController::class, 'index'])->name('index');
 
 Route::get('/register', [RegisterController::class, 'showRegistrationForm']);
 Route::post('/register', [RegisterController::class, 'register'])->name('register');
@@ -28,7 +30,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 
 Route::get('/item/{item_id}', [ItemController::class, 'show']);
 
-Route::middleware('auth')->group(function(){
+Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('/purchase/{item_id}', [PurchaseController::class, 'showPurchaseForm'])->name('purchase.show');
     Route::post('/purchase/{item_id}', [PurchaseController::class, 'purchase']);
     Route::get('/purchase/address/{item_id}', [PurchaseController::class, 'showAddressForm']);
@@ -40,4 +42,25 @@ Route::middleware('auth')->group(function(){
     Route::patch('/mypage/profile', [UserController::class, 'updateProfile']);
     Route::post('/item/{item_id}/comment', [ItemController::class, 'storeComment'])->name('comment');
     Route::post('/item/{item_id}/like', [ItemController::class, 'toggleLike'])->name('like');
+
+    // Stripe関係
+Route::get('/payment-success', [PurchaseController::class, 'success'])->name('payment.success');
+Route::get('/payment-cancel', [PurchaseController::class, 'cancel'])->name('payment.cancel');
 });
+
+// メール認証関係
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill(); // 認証完了
+    return redirect('/mypage/profile');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+// webhookで商品決済完了を記録
+Route::post('/webhook/stripe', [PurchaseController::class, 'handle']);

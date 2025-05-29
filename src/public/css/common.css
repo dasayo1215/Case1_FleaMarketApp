@@ -183,6 +183,8 @@ body {
     font-size: 14px;
     display: flex;
     justify-content: center;
+	border: none;
+	background-color: transparent;
 }
 
 .content-form__error-message {

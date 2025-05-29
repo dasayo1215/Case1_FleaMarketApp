@@ -18,10 +18,16 @@ class Purchase extends Model
         'address',
         'building',
         'completed_at',
+        'paid_at',
     ];
 
     // 日時としてキャストするカラム
     protected $casts = [
         'completed_at' => 'datetime',
+        'paid_at'=> 'datetime',
     ];
+
+    public function product() {
+        return $this->belongsTo(Product::class);
+    }
 }

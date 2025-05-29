@@ -55,10 +55,12 @@
                 $purchase = $item->purchase;
             @endphp
             @if ($purchase)
-                @if (!is_null($purchase->completed_at))
+                @if (!is_null($purchase->paid_at))
                     <div class="purchase-sold">Sold</div>
                 @elseif ($purchase->buyer_id !== $user->id)
                     <div class="purchase-unavailable">他ユーザーが購入手続き中です</div>
+                @elseif(!is_null($purchase->completed_at) && $purchase->buyer_id === $user->id)
+                    <div class="purchase-unavailable">お支払いを完了してください</div>
                 @else
                     <a class="content__purchase-btn" href="{{ url('/purchase/' . $item->id) }}">購入手続きを再開</a>
                 @endif
@@ -111,12 +113,8 @@
                         {{ $message }}
                     @enderror
                 </p>
-                @if ($purchase)
-                    @if (!is_null($purchase->completed_at))
-                        <div class="comment-unavailable">売り切れのためコメントできません</div>
-                    @else
-                        <input class="content-form__btn" type="submit" value="コメントを送信する">
-                    @endif
+                @if ($purchase && !is_null($purchase->completed_at))
+                    <div class="comment-unavailable">コメントできません</div>
                 @else
                     <input class="content-form__btn" type="submit" value="コメントを送信する">
                 @endif

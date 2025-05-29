@@ -18,41 +18,49 @@ class ItemController extends Controller
 {
     public function index(Request $request){
         $tab = $request->query('tab');
+        $keyword = $request->query('keyword');
 
         if($tab === 'mylist'){
-            return $this->mylist();
+            return $this->mylist($request);
         }
+
+        $query = Product::with('purchase');
 
         // ログインしている場合は自分が出品した商品を除外
         if (Auth::check()) {
             $user = Auth::user();
-            $items = Product::with('purchase')
-                            ->where('seller_id', '!=', $user->id)
-                            ->latest()
-                            ->get();
-        } else {
-            // ゲストは全商品を表示
-            $items = Product::with('purchase')
-                            ->latest()
-                            ->get();
+            $query->where('seller_id', '!=', $user->id);
         }
-        // $products = Product::latest()->paginate(20); // ページネーションするなら
-        return view('items.index', compact('items'));
+
+        if(!empty($keyword)){
+            $query->where('name', 'like', '%' . $keyword . '%');
+        }
+
+        $items = $query->latest()->get();
+
+        return view('items.index', compact('items', 'keyword', 'tab'));
     }
 
-    public function mylist()
+    public function mylist(Request $request)
     {
         $items = [];
 
         if (Auth::check()) {
             $user = Auth::user();
+            $keyword = $request->query('keyword');
 
             $items = Product::whereHas('likes', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
-            })->with('likes')->latest()->get();
+            })
+            ->when($keyword, function ($query, $keyword) {
+                $query->where('name', 'like', '%' . $keyword . '%');
+            })
+            ->with('likes')->latest()->get();
         }
 
-        return view('items.index', compact('items'));
+        $tab='mylist';
+
+        return view('items.index', compact('items', 'keyword', 'tab'));
     }
 
     public function show($item_id){

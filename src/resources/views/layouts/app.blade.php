@@ -19,9 +19,12 @@
             @if (!Route::is('login') && !Route::is('register'))
                 <ul class="header-nav">
                     <li class="header-nav__item">
-                        <form class="header-nav__search-form" action="/search"></form>
-                        <input class="header-nav__search-input" type="text" placeholder="なにをお探しですか？">
-                        <button class="header-nav__search-btn">検索</button>
+                        <form class="header-nav__search-form" action="{{ route('index') }}" method="GET">
+                            <input class="header-nav__search-input" type="text" name="keyword" placeholder="なにをお探しですか？"
+                                value="{{ request('keyword') }}">
+                                <input type="hidden" name="tab" value="{{ $tab ?? '' }}">
+                                <button class="header-nav__search-btn" type="submit">検索</button>
+                        </form>
                     </li>
 
                     @auth

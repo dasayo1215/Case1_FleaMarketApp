@@ -23,6 +23,7 @@ class CreatePurchasesTable extends Migration
             $table->string('address');
             $table->string('building');
             $table->timestamp('completed_at')->nullable();
+            $table->timestamp('paid_at')->nullable();
             $table->timestamps();
 
             $table->unique('product_id');
