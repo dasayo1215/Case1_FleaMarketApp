@@ -15,10 +15,11 @@ use Illuminate\Support\Facades\Log;
 
 class PurchaseController extends Controller
 {
-    public function showPurchaseForm($item_id){
+    public function showPurchaseForm(Request $request, $item_id){
         $item = Product::with('productCondition')->findOrFail($item_id);
         $payment_methods = PaymentMethod::all();
         $user = Auth::user();
+
 
         // 既に仮保存されている購入レコードがあるか検索
         $purchase = Purchase::where('product_id', $item->id)
@@ -26,16 +27,32 @@ class PurchaseController extends Controller
         ->first();
 
         if (!$purchase) {
-            // 仮保存レコードを作成
-            $purchase = Purchase::create([
+            $data = [
                 'buyer_id' => $user->id,
                 'product_id' => $item->id,
                 'purchase_price' => $item->price,
-                'postal_code' => $user->postal_code,
-                'address' => $user->address,
-                'building' => $user->building,
-                // この時点ではpayment_method_idは未設定
-            ]);
+            ];
+            if (!empty($user->postal_code)) {
+                $data['postal_code'] = $user->postal_code;
+            }
+            if (!empty($user->address)) {
+                $data['address'] = $user->address;
+            }
+            if (!empty($user->building)) {
+                $data['building'] = $user->building;
+            }
+            // 仮保存
+            $purchase = Purchase::create($data);
+        }
+
+        // payment_method_idをセッションに保存
+        if ($request->has('payment_method')) {
+            $payment_method_id = $request->input('payment_method');
+            if ($payment_method_id !== null && $payment_method_id !== '') {
+                $selected_payment_methods = session('selected_payment_methods', []);
+                $selected_payment_methods[$item->id] = $payment_method_id;
+                session(['selected_payment_methods' => $selected_payment_methods]);
+            }
         }
 
         return view('purchases.create', compact('item', 'user', 'payment_methods', 'purchase'));

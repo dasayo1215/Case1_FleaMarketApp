@@ -44,11 +44,10 @@ class ItemController extends Controller
     public function mylist(Request $request)
     {
         $items = [];
+        $keyword = $request->query('keyword');
 
         if (Auth::check()) {
             $user = Auth::user();
-            $keyword = $request->query('keyword');
-
             $items = Product::whereHas('likes', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })

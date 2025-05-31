@@ -1,18 +1,22 @@
 
-.purchase-form {
+.content__wrapper3 {
+    margin: 0 auto;
+	width: 70%;
+	max-width: 1540px;
+    margin-top: 40px;
     display: flex;
-    gap: 10%;
+    gap: 100px;
 }
 
-.content__wrapper-1 {
-    width: 60%;
+.wrapper-1 {
+    width: 70%;
 }
 
-.content__wrapper-2 {
+.wrapper-2 {
     width: 30%;
 }
 
-.content__wrapper-1-1 {
+.wrapper-1-1 {
     display: flex;
 }
 
@@ -72,7 +76,7 @@
     padding-left: 50px;
 }
 
-.address {
+.address-group-error {
     padding-bottom: 30px;
     border-bottom: solid 1px rgb(95, 95, 95);
 }

@@ -5,41 +5,35 @@
 @endsection
 
 @section('content')
+    <div class="content__wrapper3">
 
-<div class="content__wrapper2">
-
-    <div class="content__wrapper-1-1">
-        <img class="image-square" src="{{ asset('storage/products/' . $item->image_filename) }}"
-            alt="{{ $item->name }}">
-        <div class="item-detail">
-            <h2 class="content__heading">{{ $item->name }}</h2>
-            <div class="content__price price">
-                ￥ <span class="price-num">{{ number_format($item->price) }}</span>
+        <div class="wrapper-1">
+            <div class="wrapper-1-1">
+                <img class="image-square" src="{{ asset('storage/products/' . $item->image_filename) }}"
+                    alt="{{ $item->name }}">
+                <div class="item-detail">
+                    <h2 class="content__heading">{{ $item->name }}</h2>
+                    <div class="content__price price">
+                        ￥ <span class="price-num">{{ number_format($item->price) }}</span>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    {{-- 支払い方法選択フォーム（GET） --}}
-    <form method="GET" action="{{ url('/purchase/' . $item->id) }}">
-        <h3 class="item__title purchase-way">支払い方法</h3>
-        <select class="content-form__input content-form__select" name="payment_method" onchange="this.form.submit()">
-            <option value="" disabled {{ request('payment_method') ? '' : 'selected' }}>選択してください</option>
-            @foreach ($payment_methods as $payment_method)
-                <option value="{{ $payment_method->id }}"
-                    {{ request('payment_method') == $payment_method->id ? 'selected' : '' }}>
-                    {{ $payment_method->name }}
-                </option>
-            @endforeach
-        </select>
-    </form>
-
-    {{-- 購入フォーム（POST） --}}
-    <form class="purchase-form" action="{{ url('/purchase/' . $item->id) }}" method="post">
-        @csrf
-        <div class="content__wrapper-1">
-
-            {{-- 支払い方法のエラーメッセージ（POST時用） --}}
-            <input type="hidden" name="payment_method" value="{{ request('payment_method') }}">
+            {{-- 支払い方法選択フォーム --}}
+            <form method="GET" action="{{ url('/purchase/' . $item->id) }}">
+                <h3 class="item__title purchase-way">支払い方法</h3>
+                <select class="content-form__input content-form__select" name="payment_method"
+                    onchange="this.form.submit()">
+                    <option value="" disabled {{ session('selected_payment_method_id') ? '' : 'selected' }}>選択してください
+                    </option>
+                    @foreach ($payment_methods as $payment_method)
+                        <option value="{{ $payment_method->id }}"
+                            {{ (session('selected_payment_methods')[$item->id] ?? '') == $payment_method->id ? 'selected' : '' }}>
+                            {{ $payment_method->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
             <p class="content-form__error-message payment-method-error">
                 @error('payment_method')
                     {{ $message }}
@@ -55,9 +49,11 @@
                 {{ $purchase->address }}<br>
                 {{ $purchase->building }}
             </div>
-            <input type="hidden" name="postal_code" value="{{ $purchase->postal_code }}">
-            <input type="hidden" name="address" value="{{ $purchase->address }}">
-            <input type="hidden" name="building" value="{{ $purchase->building }}">
+            @if (!empty($address_error))
+                <p class="content-form__error-message address-group-error">
+                    {{ $address_error }}
+                </p>
+            @endif
             <p class="content-form__error-message address-group-error">
                 @error('address_group')
                     {{ $message }}
@@ -65,92 +61,31 @@
             </p>
         </div>
 
-        <div class="content__wrapper-2">
-            <table class="purchase-table">
-                <tr>
-                    <th class="purchase-table__th">商品代金</th>
-                    <td class="purchase-table__td price">
-                        ￥ <span class="price-num">{{ number_format($item->price) }}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="purchase-table__th">支払い方法</th>
-                    <td class="purchase-table__td">
-                        {{ optional($payment_methods->firstWhere('id', request('payment_method')))->name ?? '未選択' }}
-                    </td>
-                </tr>
-            </table>
-            <input class="content-form__btn" type="submit" value="購入する">
-        </div>
-    </form>
-</div>
-
-    {{-- <div class="content__wrapper2">
-        <form class="purchase-form" action="{{ url('/purchase/' . $item->id) }}" method="post">
-            @csrf
-            <div class="content__wrapper-1">
-                <div class="content__wrapper-1-1">
-                    <img class="image-square" src="{{ asset('storage/products/' . $item->image_filename) }}"
-                        alt="{{ $item->name }}"></img>
-                    <div class="item-detail">
-                        <h2 class="content__heading">{{ $item->name }}</h2>
-                        <div class="content__price price">￥ <span class="price-num">{{ number_format($item->price) }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <h3 class="item__title purchase-way">支払い方法</h3>
-                <select class="content-form__input content-form__select" name="payment_method" id="payment_method">
-                    <option value="" disabled selected>選択してください</option>
-                    @foreach ($payment_methods as $payment_method)
-                        <option value="{{ $payment_method->id }}"
-                            {{ old('payment_method') == $payment_method->id ? 'selected' : '' }}>
-                            {{ $payment_method->name }}
-                        </option>
-                    @endforeach
-                </select>
-                <p class="content-form__error-message payment-method-error">
-                    @error('payment_method')
-                        {{ $message }}
-                    @enderror
-                </p>
-
-                <div class="item__title-wrapper">
-                    <h3 class="item__title">配送先</h3>
-                    <a class="content-btn change-address" href="{{ url('/purchase/address/' . $item->id) }}">変更する</a>
-                </div>
-                <div class="postal-code">〒 {{ $purchase->postal_code }}</div>
-                <div class="address">
-                    {{ $purchase->address }}<br>
-                    {{ $purchase->building }}
-                </div>
-                <input type="hidden" name="postal_code" value="{{ $purchase->postal_code }}">
-<input type="hidden" name="address" value="{{ $purchase->address }}">
-<input type="hidden" name="building" value="{{ $purchase->building }}">
-                <p class="content-form__error-message address-group-error">
-                    @error('address_group')
-                        {{ $message }}
-                    @enderror
-                </p>
-            </div>
-
-            <div class="content__wrapper-2">
+        <div class="wrapper-2">
+            {{-- 購入フォーム（POST） --}}
+            <form class="purchase-form" action="{{ url('/purchase/' . $item->id) }}" method="post">
+                @csrf
                 <table class="purchase-table">
                     <tr>
                         <th class="purchase-table__th">商品代金</th>
-                        <td class="purchase-table__td price">￥ <span
-                                class="price-num">{{ number_format($item->price) }}</span>
+                        <td class="purchase-table__td price">
+                            ￥ <span class="price-num">{{ number_format($item->price) }}</span>
                         </td>
                     </tr>
                     <tr>
                         <th class="purchase-table__th">支払い方法</th>
-                        <td class="purchase-table__td">コンビニ払い</td>
+                        <td class="purchase-table__td">
+                            {{ optional($payment_methods->firstWhere('id', session('selected_payment_methods')[$item->id] ?? null))->name ?? '未選択' }}
+                        </td>
                     </tr>
                 </table>
+                <input type="hidden" name="postal_code" value="{{ $purchase->postal_code }}">
+                <input type="hidden" name="address" value="{{ $purchase->address }}">
+                <input type="hidden" name="building" value="{{ $purchase->building }}">
+                <input type="hidden" name="payment_method"
+                    value="{{ session('selected_payment_methods')[$item->id] ?? '' }}">
                 <input class="content-form__btn" type="submit" value="購入する">
-            </div>
-        </form>
-    </div> --}}
-
-
+            </form>
+        </div>
+    </div>
 @endsection('content')

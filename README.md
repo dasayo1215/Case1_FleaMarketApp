@@ -33,8 +33,9 @@ README
     - バージョン管理：Git / GitHub
     - メール開発環境：MailHog
     - 決済サービス：Stripe
+    ※一部JavaScriptを使ったのは書いた方がいいのか？？
 
-## ER図
+# ER図
 
 
 ## URL

@@ -83,15 +83,17 @@
 
             <label class="content-form__label" for="price">販売価格</label>
             <div class="input-wrapper">
-                @php
-                    $raw = old('price');
-                    $priceInput = '';
-                    if (!$errors->has('price')) {
-                        $priceInput = is_numeric($raw) ? number_format($raw) : $raw;
-                    }
-                @endphp
                 <span class="prefix">¥</span>
-                <input class="price-input" type="text" name="price" inputmode="numeric" value="{{ $priceInput }}">
+                <input class="price-input" type="text" name="price" inputmode="numeric" id="price" value="{{ old('price') }}">
+                <script>
+                    const input = document.getElementById('price');
+                    input.addEventListener('input', function () {
+                        let value = input.value.replace(/,/g, '');
+                        if (!isNaN(value) && value !== '') {
+                            input.value = Number(value).toLocaleString();
+                        }
+                    });
+                </script>
             </div>
             <p class="content-form__error-message">
                 @error('price')

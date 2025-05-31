@@ -21,7 +21,6 @@
                 </div>
                 <div class="content__like-comment">
                     @php
-                        $user = Auth::user();
                         $isLiked = $user ? $item->isLikedBy($user) : false;
                         $likeCount = $item->likes->count();
                         $commentCount = $item->comments->count();
@@ -54,7 +53,10 @@
             @php
                 $purchase = $item->purchase;
             @endphp
-            @if ($purchase)
+
+            @if ($item->seller_id == $user->id)
+                <div class="purchase-unavailable">自身の出品です</div>
+            @elseif ($purchase)
                 @if (!is_null($purchase->paid_at))
                     <div class="purchase-sold">Sold</div>
                 @elseif ($purchase->buyer_id !== $user->id)

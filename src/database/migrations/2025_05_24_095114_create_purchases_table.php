@@ -19,9 +19,9 @@ class CreatePurchasesTable extends Migration
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->unsignedBigInteger('purchase_price');
             $table->foreignId('payment_method_id')->nullable()->constrained()->nullOnDelete();
-            $table->string('postal_code', 8);
-            $table->string('address');
-            $table->string('building');
+            $table->string('postal_code', 8)->nullable();
+            $table->string('address')->nullable();
+            $table->string('building')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
