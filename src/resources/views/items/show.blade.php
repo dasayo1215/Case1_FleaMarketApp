@@ -54,14 +54,14 @@
                 $purchase = $item->purchase;
             @endphp
 
-            @if ($item->seller_id == $user->id)
+            @if ($item->seller_id == auth()->id())
                 <div class="purchase-unavailable">自身の出品です</div>
             @elseif ($purchase)
                 @if (!is_null($purchase->paid_at))
                     <div class="purchase-sold">Sold</div>
-                @elseif ($purchase->buyer_id !== $user->id)
+                @elseif (!auth()->check() || $purchase->buyer_id !== auth()->id())
                     <div class="purchase-unavailable">他ユーザーが購入手続き中です</div>
-                @elseif(!is_null($purchase->completed_at) && $purchase->buyer_id === $user->id)
+                @elseif(!is_null($purchase->completed_at) && $purchase->buyer_id === auth()->id())
                     <div class="purchase-unavailable">お支払いを完了してください</div>
                 @else
                     <a class="content__purchase-btn" href="{{ url('/purchase/' . $item->id) }}">購入手続きを再開</a>

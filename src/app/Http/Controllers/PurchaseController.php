@@ -11,6 +11,8 @@ use App\Http\Requests\AddressRequest;
 use App\Http\Requests\PurchaseRequest;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use Stripe\Webhook;
+use Stripe\Exception\SignatureVerificationException;
 use Illuminate\Support\Facades\Log;
 
 class PurchaseController extends Controller
@@ -151,7 +153,22 @@ class PurchaseController extends Controller
     public function handle(Request $request)
     {
         $payload = $request->getContent();
-        $event = json_decode($payload);
+        $sigHeader = $request->header('Stripe-Signature');
+        $secret = env('STRIPE_WEBHOOK_SECRET');
+
+        try {
+            $event = \Stripe\Webhook::constructEvent(
+                $payload, $sigHeader, $secret
+            );
+        } catch (\UnexpectedValueException $e) {
+            // 無効なペイロード
+            \Log::error('Stripe webhook: Invalid payload', ['error' => $e->getMessage()]);
+            return response('Invalid payload', 400);
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
+            // 署名検証に失敗
+            \Log::error('Stripe webhook: Signature verification failed', ['error' => $e->getMessage()]);
+            return response('Signature verification failed', 400);
+        }
 
         switch ($event->type) {
             case 'checkout.session.completed':

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ExhibitionRequest;
 use App\Http\Requests\CommentRequest;
+use App\Http\Requests\UploadImageRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Category;
@@ -104,39 +105,59 @@ class ItemController extends Controller
         return view('items.create', compact('categories', 'conditions'));
     }
 
-    public function store(ExhibitionRequest $request){
+    public function store(ExhibitionRequest $request)
+    {
         $validated = $request->validated();
-
-        // ログインユーザーIDを取得
+    
+        // ログインユーザーID
         $sellerId = auth()->id();
-
-        // productsテーブルに保存
+    
+        // 新しい Product インスタンス生成
         $product = new Product();
         $product->name = $validated['name'];
         $product->brand = $validated['brand'] ?? null;
         $product->description = $validated['description'];
-        $product->price = str_replace(',', '', $validated['price']); // コンマ除去
+        $product->price = str_replace(',', '', $validated['price']);
         $product->product_condition_id = $validated['product_condition_id'];
         $product->seller_id = $sellerId;
-
-        // 画像があるかチェックし、先にファイル名を決定・保存
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $product->image_filename = ''; // 仮の値（NOT NULL 対策）
-            $product->save();
-
-            // 保存後のIDを使ってファイル名を作成
-            $filename = $product->id . '_' . now()->format('YmdHis') . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('products', $filename, 'public');
-
-            // ファイル名を改めて保存
+    
+        // 仮に空で保存（画像ファイル名にIDを使いたいため）
+        $product->image_filename = '';
+        $product->save();
+    
+        // 画像の一時パスから正式ファイル名に変更して移動
+        $tmpPath = $validated['sell_uploaded_image_path'];
+        if ($tmpPath && \Storage::disk('public')->exists($tmpPath)) {
+            // 拡張子取得
+            $extension = pathinfo($tmpPath, PATHINFO_EXTENSION);
+    
+            // ファイル名を決定
+            $filename = $product->id . '_' . now()->format('YmdHis') . '.' . $extension;
+    
+            // ファイルを tmp → products に移動
+            \Storage::disk('public')->move($tmpPath, 'products/' . $filename);
+    
+            // ファイル名を保存
             $product->image_filename = $filename;
             $product->save();
         }
-
-        // カテゴリーは多対多なのでattach
+        session()->forget(['sell_uploaded_image_path']);
+    
+        // カテゴリーを関連付け
         $product->categories()->sync($validated['category_id']);
-
+    
         return redirect('/mypage');
     }
+    
+
+    public function uploadImage(UploadImageRequest $request) {
+        // 保存先: storage/app/public/tmp
+        $path = $request->file('image')->store('tmp', 'public');
+
+        // セッションに保存
+        session(['sell_uploaded_image_path' => $path]);
+
+        return redirect('/sell')->withInput(); // 他の入力値も復元
+    }
+
 }

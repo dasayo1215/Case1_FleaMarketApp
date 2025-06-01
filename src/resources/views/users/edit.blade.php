@@ -7,23 +7,30 @@
 @section('content')
     <div class="content__wrapper">
         <h2 class="content__heading">プロフィール設定</h2>
-        <form class="content-form__form" action="/mypage/profile" method="post" enctype="multipart/form-data">
-            @method('PATCH')
+        <form class="image-form" action="/mypage/profile/image" method="post" enctype="multipart/form-data">
             @csrf
             <div class="image-wrapper">
-                @if ($user->image_filename)
-                    <img class="image-circle" src="{{ asset('storage/users/' . $user->image_filename) }}" alt="プロフィール画像">
+                @if (session()->has('profile_uploaded_image_path'))
+                    <img class="image-circle"
+                        src="{{ asset('storage/' . session('profile_uploaded_image_path')) }}?v={{ time() }}"
+                        alt="アップロード画像">
                 @else
                     <div class="image-circle"></div>
                 @endif
                 <label class="image-label" for="image">画像を選択する</label>
-                <input class="image-input-hidden" type="file" id="image" name="image">
+                <input class="image-input-hidden" type="file" id="image" name="image"
+                    onchange="this.form.submit()">
             </div>
-            <p class="content-form__error-message image-error">
-                @error('image')
-                    {{ $message }}
-                @enderror
-            </p>
+        </form>
+        <p class="content-form__error-message image-error">
+            @error('image')
+                {{ $message }}
+            @enderror
+        </p>
+
+        <form class="content-form__form" action="/mypage/profile" method="post">
+            @method('PATCH')
+            @csrf
             <label class="content-form__label" for="name">ユーザー名</label>
             <input class="content-form__input" type="text" name="name" id="name"
                 value="{{ old('name', $user->name) }}">

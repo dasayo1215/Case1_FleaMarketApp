@@ -7,7 +7,8 @@ use App\Models\User;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\ProfileRequest;
+use App\Http\Requests\AddressRequest;
 
 class UserController extends Controller
 {
@@ -47,29 +48,40 @@ class UserController extends Controller
         return view('users.edit', compact('user'));
     }
 
-    public function updateProfile(UpdateProfileRequest $request){
+    public function updateProfile(AddressRequest $request){
         $data = $request->validated();
         $user = Auth::user();
 
         // 画像処理（アップロードされていれば保存）
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-
+        if ($path = session('profile_uploaded_image_path')) {
             // 古い画像があれば削除
             if ($user->image_filename) {
                 Storage::disk('public')->delete('users/' . $user->image_filename);
             }
     
-            // リネーム: userID_タイムスタンプ.拡張子
-            $filename = $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('users', $filename, 'public');
-    
-            // カラムに保存
+            // セッションのパスは例えば tmp/xxxx.png の形なので、ファイルを移動して名前を変える処理が必要かも
+            $filename = $user->id . '_' . time() . '.' . pathinfo($path, PATHINFO_EXTENSION);
+
+            // tmp から users フォルダへ移動
+            Storage::disk('public')->move($path, 'users/' . $filename);
+
             $data['image_filename'] = $filename;
+
+            session()->forget('profile_uploaded_image_path');
         }
 
         $user->update($data);
         return redirect('/');
+    }
+
+    public function uploadImage(ProfileRequest $request) {
+        // 保存先: storage/app/public/tmp
+        $path = $request->file('image')->store('tmp', 'public');
+
+        // セッションに保存
+        session(['profile_uploaded_image_path' => $path]);
+
+        return redirect('/mypage/profile')->withInput(); // 他の入力値も復元
     }
 }
 

@@ -7,23 +7,29 @@
 @section('content')
     <div class="content__wrapper">
         <h2 class="content__heading">商品の出品</h2>
-        <form class="content-form__form" action="/sell" method="post" enctype="multipart/form-data">
-            @csrf
-            <label class="content-form__label" for="image">商品画像</label>
-            <div class="image-wrapper">
-                <label class="image-label" for="image">画像を選択する</label>
-                <input class="image-input-hidden" type="file" id="image" name="image">
-            </div>
-            <p class="content-form__error-message">
-                @error('image')
-                    {{ $message }}
-                @else
-                    @if (old())
-                        画像は再選択が必要です。
+        <label class="content-form__label" for="image">商品画像</label>
+        <div class="image-wrapper">
+            <form class="image-form" action="/sell/image" method="post" enctype="multipart/form-data">
+                @csrf
+                @if (session('sell_uploaded_image_path'))
+                <img class="uploaded-image"
+                    src="{{ asset('storage/' . session('sell_uploaded_image_path')) }}?v={{ time() }}" alt="アップロード画像">
                     @endif
-                @enderror
-            </p>
+                <label class="image-label" for="image">画像を選択する</label>
+                <input class="image-input-hidden" type="file" id="image" name="image"
+                    onchange="this.form.submit()">
+            </form>
+        </div>
+        <p class="content-form__error-message">
+            @foreach (['image', 'sell_uploaded_image_path'] as $field)
+            @error($field)
+                {{ $message }}
+            @enderror
+        @endforeach
+        </p>
 
+        <form class="content-form__form" action="/sell" method="post">
+            @csrf
             <h3 class="item__title">商品の詳細</h3>
             <label class="content-form__label">カテゴリー</label>
             <div class="categories">
@@ -84,10 +90,11 @@
             <label class="content-form__label" for="price">販売価格</label>
             <div class="input-wrapper">
                 <span class="prefix">¥</span>
-                <input class="price-input" type="text" name="price" inputmode="numeric" id="price" value="{{ old('price') }}">
+                <input class="price-input" type="text" name="price" inputmode="numeric" id="price"
+                    value="{{ old('price') }}">
                 <script>
                     const input = document.getElementById('price');
-                    input.addEventListener('input', function () {
+                    input.addEventListener('input', function() {
                         let value = input.value.replace(/,/g, '');
                         if (!isNaN(value) && value !== '') {
                             input.value = Number(value).toLocaleString();
@@ -100,7 +107,9 @@
                     {{ $message }}
                 @enderror
             </p>
-
+            @if (session()->has('sell_uploaded_image_path'))
+                <input type="hidden" name="sell_uploaded_image_path" value="{{ session('sell_uploaded_image_path') }}">
+            @endif
             <input class="content-form__btn" type="submit" value="出品する">
         </form>
     </div>

@@ -19,6 +19,21 @@ class RegisterController extends Controller
     public function register(RegisterRequest $request){
         $data = $request->validated();
 
+        $existing = User::where('email', $data['email'])->first();
+
+        if ($existing) {
+            if ($existing->hasVerifiedEmail()) {
+                // すでに認証済み
+                return back()->withErrors(['email' => 'このメールアドレスは既に登録されています'])->withInput();
+            } else {
+                // 認証未完了 → メールを再送する
+                $existing->sendEmailVerificationNotification();
+                return redirect()
+                    ->route('verification.notice')
+                    ->with('message', '以前登録されたメールアドレスが未認証のため、認証メールを再送しました。');
+            }
+        }
+
         $user = app(CreatesNewUsers::class)->create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -29,6 +44,6 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('verification.notice');
+        return redirect()->route('verification.notice')->with('message', '登録していただいたメールアドレスに認証メールを送付しました。');
     }
 }
