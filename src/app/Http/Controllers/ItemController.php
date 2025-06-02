@@ -13,7 +13,6 @@ use App\Models\Product;
 use App\Models\Like;
 use App\Models\Comment;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ItemController extends Controller
 {
@@ -63,28 +62,28 @@ class ItemController extends Controller
         return view('items.index', compact('items', 'keyword', 'tab'));
     }
 
-    public function show($item_id){
-        $item = Product::with(['categories', 'productCondition', 'purchase'])->findOrFail($item_id);
+    public function show($itemId){
+        $item = Product::with(['categories', 'productCondition', 'purchase'])->findOrFail($itemId);
         $user = Auth::user();
         return view('items.show', compact('item', 'user'));
     }
 
-    public function storeComment(CommentRequest $request, $item_id){
+    public function storeComment(CommentRequest $request, $itemId){
         $request->validated();
-    
+
         Comment::create([
             'user_id' => Auth::id(),
-            'product_id' => $item_id,
+            'product_id' => $itemId,
             'comment' => $request->comment,
         ]);
-    
+
         return redirect()->back();
     }
 
-    public function toggleLike($item_id){
+    public function toggleLike($itemId){
         $user = Auth::user();
         $like = Like::where('user_id', $user->id)
-                    ->where('product_id', $item_id)
+                    ->where('product_id', $itemId)
                     ->first();
 
         if ($like) {
@@ -92,7 +91,7 @@ class ItemController extends Controller
         } else {
             Like::create([
                 'user_id' => $user->id,
-                'product_id' => $item_id,
+                'product_id' => $itemId,
             ]);
         }
 
@@ -108,10 +107,8 @@ class ItemController extends Controller
     public function store(ExhibitionRequest $request)
     {
         $validated = $request->validated();
-    
-        // ログインユーザーID
         $sellerId = auth()->id();
-    
+
         // 新しい Product インスタンス生成
         $product = new Product();
         $product->name = $validated['name'];
@@ -120,44 +117,39 @@ class ItemController extends Controller
         $product->price = str_replace(',', '', $validated['price']);
         $product->product_condition_id = $validated['product_condition_id'];
         $product->seller_id = $sellerId;
-    
+
         // 仮に空で保存（画像ファイル名にIDを使いたいため）
         $product->image_filename = '';
         $product->save();
-    
+
         // 画像の一時パスから正式ファイル名に変更して移動
         $tmpPath = $validated['sell_uploaded_image_path'];
         if ($tmpPath && \Storage::disk('public')->exists($tmpPath)) {
-            // 拡張子取得
             $extension = pathinfo($tmpPath, PATHINFO_EXTENSION);
-    
-            // ファイル名を決定
             $filename = $product->id . '_' . now()->format('YmdHis') . '.' . $extension;
-    
-            // ファイルを tmp → products に移動
             \Storage::disk('public')->move($tmpPath, 'products/' . $filename);
-    
-            // ファイル名を保存
             $product->image_filename = $filename;
             $product->save();
         }
         session()->forget(['sell_uploaded_image_path']);
-    
-        // カテゴリーを関連付け
+
         $product->categories()->sync($validated['category_id']);
-    
+
         return redirect('/mypage');
     }
-    
 
     public function uploadImage(UploadImageRequest $request) {
-        // 保存先: storage/app/public/tmp
         $path = $request->file('image')->store('tmp', 'public');
 
         // セッションに保存
         session(['sell_uploaded_image_path' => $path]);
 
-        return redirect('/sell')->withInput(); // 他の入力値も復元
-    }
+        // 他の入力値も渡す
+        $oldInputs = $request->only(['name', 'brand', 'description', 'price', 'product_condition_id']);
+        $oldInputs['category_id'] = $request->input('category_id', []);
+        $categories = Category::all();
+        $conditions = ProductCondition::all();
 
+        return redirect()->route('sell')->withInput()->with('sell_uploaded_image_path', $path);
+    }
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class ProfileRequest extends FormRequest
 {
@@ -25,6 +27,10 @@ class ProfileRequest extends FormRequest
     {
         return [
             'image' => ['nullable', 'image', 'mimes:jpeg,png'],
+            'name' => ['nullable'],
+            'postal_code' => ['nullable'],
+            'address' => ['nullable'],
+            'building' => ['nullable'],
         ];
     }
 
@@ -33,5 +39,13 @@ class ProfileRequest extends FormRequest
             'image.image' => '拡張子が.jpegもしくは.pngの画像を選択してください',
             'image.mimes' => '拡張子が.jpegもしくは.pngの画像を選択してください',
         ];
+    }
+
+    public function failedValidation(Validator $validator) {
+        throw new HttpResponseException(
+            redirect('/mypage/profile')
+                ->withErrors($validator)
+                ->withInput()
+        );
     }
 }

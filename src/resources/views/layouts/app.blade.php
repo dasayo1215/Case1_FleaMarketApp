@@ -14,41 +14,41 @@
         <header class="header">
             <h1 class="sr-only">COACHTECH</h1>
             <a class="header-logo" href="{{ url('/') }}">
-                <img class="header-logo__img" src="{{ asset('storage/assets/logo.svg') }}" alt="ロゴ">
+                <img class="header-logo-img" src="{{ asset('storage/assets/logo.svg') }}" alt="ロゴ">
             </a>
             @if (!Route::is('login') && !Route::is('register'))
                 <ul class="header-nav">
-                    <li class="header-nav__item">
-                        <form class="header-nav__search-form" action="{{ route('index') }}" method="GET">
-                            <input class="header-nav__search-input" type="text" name="keyword" placeholder="なにをお探しですか？"
+                    <li class="header-nav-item-search">
+                        <form class="header-nav-search-form" action="{{ route('index') }}" method="GET">
+                            <input class="header-nav-search-input" type="text" name="keyword" placeholder="なにをお探しですか？"
                                 value="{{ request('keyword') }}">
                                 <input type="hidden" name="tab" value="{{ $tab ?? '' }}">
-                                <button class="header-nav__search-btn" type="submit">検索</button>
+                                <button class="header-nav-search-btn" type="submit">検索</button>
                         </form>
                     </li>
 
                     @auth
-                        <li class="header-nav__item">
-                            <form class="header-nav__auth-form" action="/logout" method="post">
+                        <li class="header-nav-item">
+                            <form class="header-nav-auth-form" action="/logout" method="post">
                                 @csrf
-                                <button class="header-nav__auth-btn">ログアウト</button>
+                                <button class="header-nav-auth-btn">ログアウト</button>
                             </form>
                         </li>
                     @endauth
                     @guest
-                        <li class="header-nav__item">
-                            <form class="header-nav__auth-form" action="/logout" method="post">
+                        <li class="header-nav-item">
+                            <form class="header-nav-auth-form" action="/logout" method="post">
                                 @csrf
-                                <a class="header-nav__auth-btn" href="{{ route('login') }}">ログイン</a>
+                                <a class="header-nav-auth-btn" href="{{ route('login') }}">ログイン</a>
                             </form>
                         </li>
                     @endguest
 
-                    <li class="header-nav__item">
-                        <a class="header-nav__mypage" href="{{ route('mypage') }}">マイページ</a>
+                    <li class="header-nav-item">
+                        <a class="header-nav-mypage" href="{{ route('mypage') }}">マイページ</a>
                     </li>
-                    <li class="header-nav__item">
-                        <a class="header-nav__sale" href="{{ route('sell') }}">出品</a>
+                    <li class="header-nav-item">
+                        <a class="header-nav-sale" href="{{ route('sell') }}">出品</a>
                     </li>
                 </ul>
             @endif
@@ -56,8 +56,8 @@
         <div class="content">
             @yield('content')
         </div>
-
     </div>
+    @yield('scripts')
 </body>
 
 </html>

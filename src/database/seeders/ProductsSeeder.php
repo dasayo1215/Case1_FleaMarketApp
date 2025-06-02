@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use App\Models\ProductCondition;
 use App\Models\Product;
 use App\Models\Category;
@@ -17,9 +16,19 @@ class ProductsSeeder extends Seeder
      *
      * @return void
      */
+
     public function run()
     {
-        $products = [
+        $products = $this->getProducts();
+
+        foreach ($products as $item) {
+            $this->seedProduct($item);
+        }
+    }
+
+    private function getProducts(): array
+    {
+        return [
             [
                 'name' => '腕時計',
                 'price' => 15000,
@@ -101,39 +110,39 @@ class ProductsSeeder extends Seeder
                 'categories' => ['コスメ', 'レディース'],
             ],
         ];
+    }
 
-        foreach ($products as $item) {
-            // 商品状態を取得または作成
-            $condition = ProductCondition::firstOrCreate(['name' => $item['condition']]);
+    private function seedProduct(array $item): void
+    {
+        $condition = ProductCondition::firstOrCreate(['name' => $item['condition']]);
 
-            // Productの仮保存（image_filename だけ先に仮に入れておく）
-            $product = new Product();
-            $product->name = $item['name'];
-            $product->brand = 'ノーブランド';
-            $product->description = $item['description'];
-            $product->price = $item['price'];
-            $product->product_condition_id = $condition->id;
-            $product->seller_id = rand(1, 30); // 1〜30のランダム
-            $product->image_filename = ''; // NOT NULL 対策
-            $product->save();
+        // Productの仮保存（image_filename だけ先に仮に入れておく）
+        $product = new Product();
+        $product->name = $item['name'];
+        $product->brand = 'ノーブランド';
+        $product->description = $item['description'];
+        $product->price = $item['price'];
+        $product->product_condition_id = $condition->id;
+        $product->seller_id = rand(1, 30); // 1〜30のランダム
+        $product->image_filename = ''; // NOT NULL 対策
+        $product->save();
 
-            // 保存後のIDを元に画像ファイル名を生成
-            $filename = $product->id . '_' . now()->format('YmdHis') . '.jpg';
+        // 保存後のIDを元に画像ファイル名を生成
+        $filename = $product->id . '_' . now()->format('YmdHis') . '.jpg';
 
-            try {
-                $imageContents = Http::get($item['img_url'])->body();
-                Storage::disk('public')->put('products/' . $filename, $imageContents);
-            } catch (\Exception $e) {
-                $filename = 'noimage.jpg'; // エラー時に代替画像
-            }
-
-            // 画像ファイル名を再保存
-            $product->image_filename = $filename;
-            $product->save();
-
-            // カテゴリを関連付け
-            $categories = Category::whereIn('name', $item['categories'])->get();
-            $product->categories()->attach($categories);
+        try {
+            $imageContents = Http::get($item['img_url'])->body();
+            Storage::disk('public')->put('products/' . $filename, $imageContents);
+        } catch (\Exception $e) {
+            $filename = 'noimage.jpg'; // エラー時に代替画像
         }
+
+        // 画像ファイル名を再保存
+        $product->image_filename = $filename;
+        $product->save();
+
+        // カテゴリを関連付け
+        $categories = Category::whereIn('name', $item['categories'])->get();
+        $product->categories()->attach($categories);
     }
 }

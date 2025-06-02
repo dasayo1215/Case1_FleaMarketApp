@@ -33,7 +33,7 @@ body {
 	align-items: center;
 }
 
-.header-logo__img {
+.header-logo-img {
 	height: 100%;
 	max-height: 100%;
 	max-width: 100%;
@@ -52,55 +52,57 @@ body {
 	align-items: center;
 }
 
-.header-nav__item,
-.header-nav__search-form,
-.header-nav__auth-form {
+.header-nav-item-search,
+.header-nav-item,
+.header-nav-search-form,
+.header-nav-auth-form {
 	height: 100%;
+	width: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	font-size: 14px;
-	gap: 8px; /* .header-nav__search-form用 */
+	gap: 8px; /* .header-nav-search-form用 */
 }
 
-.header-nav__item:first-child {
+.header-nav-item-search {
 	width: 50%;
 	margin: 0 10px;
 }
 
-.header-nav__item:not(:first-child) {
+.header-nav-item {
 	width: calc(50% / 3);
 }
 
-.header-nav__search-input,
-.header-nav__search-btn {
+.header-nav-search-input,
+.header-nav-search-btn {
 	box-sizing: border-box;
 }
 
-.header-nav__search-input {
+.header-nav-search-input {
 	border: none;
 	height: 80%;
-	width: 80%;
-	max-width: 300px;
+	width: 100%;
+	max-width: 400px;
 	border-radius: 3px;
 	padding-left: 20px;
 }
 
-.header-nav__search-input::placeholder {
+.header-nav-search-input::placeholder {
 	font-size: 14px;
 	color: black;
 }
 
-.header-nav__auth-btn,
-.header-nav__mypage {
+.header-nav-auth-btn,
+.header-nav-mypage {
 	all: unset;
 	cursor: pointer;
 	text-decoration: none;
 	color: white;
 }
 
-.header-nav__search-btn,
-.header-nav__sale {
+.header-nav-search-btn,
+.header-nav-sale {
 	all: unset;
 	cursor: pointer;
 	text-decoration: none;

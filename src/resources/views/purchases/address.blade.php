@@ -3,7 +3,7 @@
 @section('content')
     <div class="content__wrapper">
         <h2 class="content__heading">住所の変更</h2>
-        <form class="content-form__form" action="{{ url('/purchase/address/' . $item_id) }}" method="post">
+        <form class="content-form__form" action="{{ url('/purchase/address/' . $itemId) }}" method="post">
             @csrf
             <label class="content-form__label" for="postal_code">郵便番号</label>
             <input class="content-form__input" type="text" name="postal_code" id="postal_code" value="{{ old('postal_code') }}">

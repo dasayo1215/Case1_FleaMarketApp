@@ -5,6 +5,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -28,13 +29,13 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 Route::get('/login', [LoginController::class, 'showLoginForm']);
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 
-Route::get('/item/{item_id}', [ItemController::class, 'show']);
+Route::get('/item/{itemId}', [ItemController::class, 'show']);
 
 Route::middleware(['auth', 'verified'])->group(function(){
-    Route::get('/purchase/{item_id}', [PurchaseController::class, 'showPurchaseForm'])->name('purchase.show');
-    Route::post('/purchase/{item_id}', [PurchaseController::class, 'purchase']);
-    Route::get('/purchase/address/{item_id}', [PurchaseController::class, 'showAddressForm']);
-    Route::post('/purchase/address/{item_id}', [PurchaseController::class, 'updateAddress']);
+    Route::get('/purchase/{itemId}', [PurchaseController::class, 'showPurchaseForm'])->name('purchase.show');
+    Route::post('/purchase/{itemId}', [PurchaseController::class, 'purchase']);
+    Route::get('/purchase/address/{itemId}', [PurchaseController::class, 'showAddressForm']);
+    Route::post('/purchase/address/{itemId}', [PurchaseController::class, 'updateAddress']);
     Route::get('/sell', [ItemController::class, 'showSellForm'])->name('sell');
     Route::post('/sell', [ItemController::class, 'store']);
     Route::post('/sell/image', [ItemController::class, 'uploadImage']);
@@ -42,9 +43,8 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('/mypage/profile', [UserController::class, 'editProfile']);
     Route::patch('/mypage/profile', [UserController::class, 'updateProfile']);
     Route::post('/mypage/profile/image', [UserController::class, 'uploadImage']);
-
-    Route::post('/item/{item_id}/comment', [ItemController::class, 'storeComment'])->name('comment');
-    Route::post('/item/{item_id}/like', [ItemController::class, 'toggleLike'])->name('like');
+    Route::post('/item/{itemId}/comment', [ItemController::class, 'storeComment'])->name('comment');
+    Route::post('/item/{itemId}/like', [ItemController::class, 'toggleLike'])->name('like');
 
     // Stripe関係
     Route::get('/payment-success', [PurchaseController::class, 'success'])->name('payment.success');
@@ -67,4 +67,4 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 // webhookで商品決済完了を記録
-Route::post('/webhook/stripe', [PurchaseController::class, 'handle']);
+Route::post('/webhook/stripe', [StripeWebhookController::class, 'handle']);

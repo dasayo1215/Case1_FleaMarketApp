@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -16,10 +15,8 @@ class UserController extends Controller
         $tab = $request->query('tab');
 
         if($tab === 'buy'){
-            // /mypage?tab=buy
             return $this->purchasedItems();
         }else{
-            // /mypage?tab=sell
             return $this->listedItems();
         }
     }
@@ -58,13 +55,9 @@ class UserController extends Controller
             if ($user->image_filename) {
                 Storage::disk('public')->delete('users/' . $user->image_filename);
             }
-    
-            // セッションのパスは例えば tmp/xxxx.png の形なので、ファイルを移動して名前を変える処理が必要かも
+
             $filename = $user->id . '_' . time() . '.' . pathinfo($path, PATHINFO_EXTENSION);
-
-            // tmp から users フォルダへ移動
             Storage::disk('public')->move($path, 'users/' . $filename);
-
             $data['image_filename'] = $filename;
 
             session()->forget('profile_uploaded_image_path');
@@ -81,7 +74,10 @@ class UserController extends Controller
         // セッションに保存
         session(['profile_uploaded_image_path' => $path]);
 
-        return redirect('/mypage/profile')->withInput(); // 他の入力値も復元
+        // 他の入力値も渡す
+        $oldInputs = $request->only(['name', 'postal_code', 'address', 'building']);
+        $user = Auth::user();
+
+        return view('users.edit', compact('oldInputs', 'user'));
     }
 }
-
