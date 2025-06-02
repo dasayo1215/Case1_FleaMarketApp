@@ -10,10 +10,14 @@
         <form class="image-form" action="/mypage/profile/image" method="post" enctype="multipart/form-data">
             @csrf
             <div class="image-wrapper">
-                @if (session()->has('profile_uploaded_image_path'))
-                    <img class="image-circle"
-                        src="{{ asset('storage/' . session('profile_uploaded_image_path')) }}?v={{ time() }}"
-                        alt="アップロード画像">
+                @php
+                    $imagePath =
+                        session('profile_uploaded_image_path') ??
+                        ($user->image_filename ? 'users/' . $user->image_filename : null);
+                @endphp
+                @if ($imagePath)
+                    <img class="image-circle" src="{{ asset('storage/' . $imagePath) }}?v={{ time() }}"
+                        alt="プロフィール画像">
                 @else
                     <div class="image-circle"></div>
                 @endif

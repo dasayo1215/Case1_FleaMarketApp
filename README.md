@@ -67,6 +67,7 @@ README
 # ngrokとwebhookの設定について（毎回設定）
     支払いテストの実行のため、ngrokを利用します。
     ※あくまで開発専用で、本番環境では使わないようにしてください。
+    1. ngrokでアカウント作成
     1. ngrok http 80
     2. 出力されるURLをコピー
         > Forwarding  https://3092-xx-xx-xx.ngrok-free.app -> http://localhost:80
@@ -77,10 +78,12 @@ README
     ※利用終了後はCtrl+Cなどでトンネルを停止してください。
 
 # Stripe CLIの設定について（毎回設定）
-    1. なんか設定する
-        自分の場合はDocker利用で動かす。下記でキーが出てくる。
-        > Ready! You are using Stripe API Version [2025-04-30.basil]. Your webhook signing secret is whsec_xxxxxxxxxxxxxxxxxxxxx(^C to quit)
-    2. プロジェクトの `.env` ファイルに以下の環境変数を追加します。
+    1. docker run --rm -it -v ~/.config/stripe:/root/.config/stripe stripe/stripe-cli login
+        出力されたURLに接続して認証を行います。
+    2. docker-compose logs stripe-cli
+        下記のようにキーが出力される。
+        > stripe-cli  | Ready! You are using Stripe API Version [2025-04-30.basil]. Your webhook signing secret is whsec_xxxxxxxxxxxxxxxxxxxxx (^C to quit)
+    3. プロジェクトの `.env` ファイルに以下の環境変数を追加します。
 
         ```env
         STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxx

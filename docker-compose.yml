@@ -45,3 +45,12 @@ services:
             - "8025:8025"
             - "1025:1025"
 
+    stripe-cli:
+        image: stripe/stripe-cli
+        container_name: stripe-cli
+        volumes:
+            - ~/.config/stripe:/root/.config/stripe
+        command: >
+            listen --forward-to http://host.docker.internal/webhook/stripe
+        restart: unless-stopped
+
