@@ -5,6 +5,13 @@
 @endsection
 
 @section('content')
+    @php
+        $name = old('name', $user->name);
+        $postalCode = old('postal_code', $user->postal_code);
+        $address = old('address', $user->address);
+        $building = old('building', $user->building);
+    @endphp
+
     <div class="content__wrapper">
         <h2 class="content__heading">プロフィール設定</h2>
         <form class="image-form" action="/mypage/profile/image" method="post" enctype="multipart/form-data">
@@ -26,10 +33,10 @@
                     onchange="this.form.submit()">
             </div>
             {{-- 他のフォームの値をhiddenで送信 --}}
-            <input type="hidden" name="name" id="hidden-name" value="{{ old('name', $oldInputs['name'] ?? $user->name) }}">
-            <input type="hidden" name="postal_code" id="hidden-postal_code" value="{{ old('postal_code', $oldInputs['postal_code'] ?? $user->postal_code) }}">
-            <input type="hidden" name="address" id="hidden-address" value="{{ old('address', $oldInputs['address'] ?? $user->address) }}">
-            <input type="hidden" name="building" id="hidden-building" value="{{ old('building', $oldInputs['building'] ?? $user->building) }}">
+            <input type="hidden" name="name" id="hidden-name" value="{{ $name }}">
+            <input type="hidden" name="postal_code" id="hidden-postal_code" value="{{ $postalCode }}">
+            <input type="hidden" name="address" id="hidden-address" value="{{ $address }}">
+            <input type="hidden" name="building" id="hidden-building" value="{{ $building }}">
         </form>
         <p class="content-form__error-message image-error">
             @error('image')
@@ -41,16 +48,15 @@
             @method('PATCH')
             @csrf
             <label class="content-form__label" for="name">ユーザー名</label>
-            <input class="content-form__input" type="text" name="name" id="input-name"
-                value="{{ old('name', $oldInputs['name'] ?? $user->name) }}">
-                <p class="content-form__error-message">
-            @error('name')
-                {{ $message }}
-            @enderror
+            <input class="content-form__input" type="text" name="name" id="input-name" value="{{ $name }}">
+            <p class="content-form__error-message">
+                @error('name')
+                    {{ $message }}
+                @enderror
             </p>
             <label class="content-form__label" for="postal_code">郵便番号</label>
             <input class="content-form__input" type="text" name="postal_code" id="input-postal_code"
-                value="{{ old('postal_code', $oldInputs['postal_code'] ?? $user->postal_code) }}">
+                value="{{ $postalCode }}">
             <p class="content-form__error-message">
                 @error('postal_code')
                     {{ $message }}
@@ -58,7 +64,7 @@
             </p>
             <label class="content-form__label" for="address">住所</label>
             <input class="content-form__input" type="text" name="address" id="input-address"
-                value="{{ old('address', $oldInputs['address'] ?? $user->address) }}">
+                value="{{ $address }}">
             <p class="content-form__error-message">
                 @error('address')
                     {{ $message }}
@@ -66,12 +72,16 @@
             </p>
             <label class="content-form__label" for="building">建物名</label>
             <input class="content-form__input" type="text" name="building" id="input-building"
-                value="{{ old('building', $oldInputs['building'] ?? $user->building) }}">
+                value="{{ $building }}">
             <p class="content-form__error-message">
                 @error('building')
                     {{ $message }}
                 @enderror
             </p>
+            @if (session()->has('profile_uploaded_image_path'))
+                <input type="hidden" name="profile_uploaded_image_path"
+                    value="{{ session('profile_uploaded_image_path') }}">
+            @endif
             <input class="content-form__btn" type="submit" value="更新する">
         </form>
     </div>

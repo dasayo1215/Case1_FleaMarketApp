@@ -26,10 +26,10 @@
                     onchange="this.form.submit()">
                     <option value="" disabled {{ session('selected_payment_method_id') ? '' : 'selected' }}>選択してください
                     </option>
-                    @foreach ($payment_methods as $payment_method)
-                        <option value="{{ $payment_method->id }}"
-                            {{ (session('selected_payment_methods')[$item->id] ?? '') == $payment_method->id ? 'selected' : '' }}>
-                            {{ $payment_method->name }}
+                    @foreach ($paymentMethods as $paymentMethod)
+                        <option value="{{ $paymentMethod->id }}"
+                            {{ (session('selected_payment_methods')[$item->id] ?? '') == $paymentMethod->id ? 'selected' : '' }}>
+                            {{ $paymentMethod->name }}
                         </option>
                     @endforeach
                 </select>
@@ -75,7 +75,7 @@
                     <tr>
                         <th class="purchase-table__th">支払い方法</th>
                         <td class="purchase-table__td">
-                            {{ optional($payment_methods->firstWhere('id', session('selected_payment_methods')[$item->id] ?? null))->name ?? '未選択' }}
+                            {{ optional($paymentMethods->firstWhere('id', session('selected_payment_methods')[$item->id] ?? null))->name ?? '未選択' }}
                         </td>
                     </tr>
                 </table>

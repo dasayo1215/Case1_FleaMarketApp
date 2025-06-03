@@ -48,7 +48,7 @@
                 @foreach ($categories as $category)
                     <label class="category-button">
                         <input class="category-input" type="checkbox" name="category_id[]" value="{{ $category->id }}"
-                        {{ in_array($category->id, old('category_id', [])) ? 'checked' : '' }}>
+                            {{ in_array($category->id, old('category_id', [])) ? 'checked' : '' }}>
                         <span class="category-text">{{ $category->name }}</span>
                     </label>
                 @endforeach
@@ -61,10 +61,12 @@
 
             <label class="content-form__label" for="product_condition_id">商品の状態</label>
             <select class="content-form__input content-form__select" name="product_condition_id" id="product_condition_id">
-                <option value="" disabled selected>選択してください</option>
+                <option value="" disabled
+                    {{ old('product_condition_id') ? '' : 'selected' }}>
+                    選択してください</option>
                 @foreach ($conditions as $condition)
                     <option value="{{ $condition->id }}"
-                        {{ old('product_condition_id') == $condition->id ? 'selected' : '' }}>
+                        {{ (old('product_condition_id')) == $condition->id ? 'selected' : '' }}>
                         {{ $condition->name }}
                     </option>
                 @endforeach
@@ -77,14 +79,16 @@
 
             <h3 class="item__title">商品名と説明</h3>
             <label class="content-form__label" for="name">商品名</label>
-            <input class="content-form__input" type="text" name="name" id="name" value="{{ old('name') }}">
+            <input class="content-form__input" type="text" name="name" id="name"
+                value="{{ old('name') }}">
             <p class="content-form__error-message">
                 @error('name')
                     {{ $message }}
                 @enderror
             </p>
             <label class="content-form__label" for="brand">ブランド名</label>
-            <input class="content-form__input" type="text" name="brand" id="brand" value="{{ old('brand') }}">
+            <input class="content-form__input" type="text" name="brand" id="brand"
+                value="{{ old('brand') }}">
             <p class="content-form__error-message">
                 @error('brand')
                     {{ $message }}
@@ -92,7 +96,7 @@
             </p>
 
             <label class="content-form__label" for="description">商品の説明</label>
-            <textarea class="content-form__textarea" name="description" id="description" cols="30" rows="10">{{ old('description') }}</textarea>
+            <textarea class="content-form__textarea" name="description" id="description">{{ old('description') }}</textarea>
             <p class="content-form__error-message">
                 @error('description')
                     {{ $message }}

@@ -16,7 +16,6 @@ class ClearImageSessionUnlessProfileOrSell
      */
     public function handle(Request $request, Closure $next)
     {
-        // 残しておきたいルート（URIベースでOK）
         $keepRoutesForSell = [
             'sell',
             'sell/image',

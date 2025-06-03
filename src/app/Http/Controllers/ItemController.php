@@ -131,9 +131,10 @@ class ItemController extends Controller
             $product->image_filename = $filename;
             $product->save();
         }
-        session()->forget(['sell_uploaded_image_path']);
 
         $product->categories()->sync($validated['category_id']);
+
+        session()->forget(['sell_uploaded_image_path']);
 
         return redirect('/mypage');
     }
@@ -143,13 +144,8 @@ class ItemController extends Controller
 
         // セッションに保存
         session(['sell_uploaded_image_path' => $path]);
+        session()->flashInput($request->except('image'));
 
-        // 他の入力値も渡す
-        $oldInputs = $request->only(['name', 'brand', 'description', 'price', 'product_condition_id']);
-        $oldInputs['category_id'] = $request->input('category_id', []);
-        $categories = Category::all();
-        $conditions = ProductCondition::all();
-
-        return redirect()->route('sell')->withInput()->with('sell_uploaded_image_path', $path);
+        return redirect()->route('sell');
     }
 }

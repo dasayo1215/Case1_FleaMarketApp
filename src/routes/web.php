@@ -40,7 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::post('/sell', [ItemController::class, 'store']);
     Route::post('/sell/image', [ItemController::class, 'uploadImage']);
     Route::get('/mypage', [UserController::class, 'showProfile'])->name('mypage');
-    Route::get('/mypage/profile', [UserController::class, 'editProfile']);
+    Route::get('/mypage/profile', [UserController::class, 'editProfile'])->name('profile.edit');
     Route::patch('/mypage/profile', [UserController::class, 'updateProfile']);
     Route::post('/mypage/profile/image', [UserController::class, 'uploadImage']);
     Route::post('/item/{itemId}/comment', [ItemController::class, 'storeComment'])->name('comment');

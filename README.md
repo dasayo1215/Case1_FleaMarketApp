@@ -79,7 +79,7 @@ README
 
 # Stripe CLIの設定について（毎回設定）
     1. docker run --rm -it -v ~/.config/stripe:/root/.config/stripe stripe/stripe-cli login
-        出力されたURLに接続して認証を行います。
+        指示に従い、出力されたURLに接続して認証を行います。
     2. docker-compose logs stripe-cli
         下記のようにキーが出力される。
         > stripe-cli  | Ready! You are using Stripe API Version [2025-04-30.basil]. Your webhook signing secret is whsec_xxxxxxxxxxxxxxxxxxxxx (^C to quit)

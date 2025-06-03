@@ -49,9 +49,10 @@ class UserController extends Controller
         $data = $request->validated();
         $user = Auth::user();
 
-        // 画像処理（アップロードされていれば保存）
-        if ($path = session('profile_uploaded_image_path')) {
-            // 古い画像があれば削除
+        $path = $request->input('profile_uploaded_image_path');
+
+        if ($path) {
+            // 古い画像を削除
             if ($user->image_filename) {
                 Storage::disk('public')->delete('users/' . $user->image_filename);
             }
@@ -59,25 +60,22 @@ class UserController extends Controller
             $filename = $user->id . '_' . time() . '.' . pathinfo($path, PATHINFO_EXTENSION);
             Storage::disk('public')->move($path, 'users/' . $filename);
             $data['image_filename'] = $filename;
-
-            session()->forget('profile_uploaded_image_path');
         }
 
         $user->update($data);
+
+        session()->forget('profile_uploaded_image_path');
+
         return redirect('/');
     }
 
     public function uploadImage(ProfileRequest $request) {
-        // 保存先: storage/app/public/tmp
         $path = $request->file('image')->store('tmp', 'public');
 
         // セッションに保存
         session(['profile_uploaded_image_path' => $path]);
+        session()->flashInput($request->except('image'));
 
-        // 他の入力値も渡す
-        $oldInputs = $request->only(['name', 'postal_code', 'address', 'building']);
-        $user = Auth::user();
-
-        return view('users.edit', compact('oldInputs', 'user'));
+        return redirect()->route('profile.edit');
     }
 }

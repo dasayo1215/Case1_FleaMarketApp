@@ -15,7 +15,7 @@ class PurchaseController extends Controller
 {
     public function showPurchaseForm(Request $request, $itemId){
         $item = Product::with('productCondition')->findOrFail($itemId);
-        $payment_methods = PaymentMethod::all();
+        $paymentMethods = PaymentMethod::all();
         $user = Auth::user();
 
         // 既に仮保存されている購入レコードがあるか検索
@@ -41,18 +41,18 @@ class PurchaseController extends Controller
             $purchase = Purchase::create($data); // 仮保存
         }
 
-        // payment_method_idをセッションに保存
+        // paymentMethodIdをセッションに保存
         if ($request->has('payment_method')) {
-            $payment_method_id = $request->input('payment_method');
+            $paymentMethodId = $request->input('payment_method');
 
-            if ($payment_method_id !== null && $payment_method_id !== '') {
-                $selected_payment_methods = session('selected_payment_methods', []);
-                $selected_payment_methods[$item->id] = $payment_method_id;
-                session(['selected_payment_methods' => $selected_payment_methods]);
+            if ($paymentMethodId !== null && $paymentMethodId !== '') {
+                $selectedPaymentMethods = session('selected_payment_methods', []);
+                $selectedPaymentMethods[$item->id] = $paymentMethodId;
+                session(['selected_payment_methods' => $selectedPaymentMethods]);
             }
         }
 
-        return view('purchases.create', compact('item', 'user', 'payment_methods', 'purchase'));
+        return view('purchases.create', compact('item', 'user', 'paymentMethods', 'purchase'));
     }
 
     public function purchase(PurchaseRequest $request, $itemId){
