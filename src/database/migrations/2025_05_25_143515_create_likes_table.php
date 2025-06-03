@@ -16,10 +16,10 @@ class CreateLikesTable extends Migration
         Schema::create('likes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('item_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
 
-            $table->unique(['product_id', 'user_id']); // 重複防止
+            $table->unique(['item_id', 'user_id']); // 重複防止
         });
     }
 

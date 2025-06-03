@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class ProductConditionsSeeder extends Seeder
+class ItemConditionsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -22,7 +22,7 @@ class ProductConditionsSeeder extends Seeder
         ];
 
         foreach ($names as $name) {
-            DB::table('product_conditions')->insert([
+            DB::table('item_conditions')->insert([
                 'name' => $name,
             ]);
         }

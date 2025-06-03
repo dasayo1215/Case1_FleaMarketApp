@@ -11,7 +11,7 @@ class Purchase extends Model
 
     protected $fillable = [
         'buyer_id',
-        'product_id',
+        'item_id',
         'purchase_price',
         'payment_method_id',
         'postal_code',
@@ -27,7 +27,7 @@ class Purchase extends Model
         'paid_at'=> 'datetime',
     ];
 
-    public function product() {
-        return $this->belongsTo(Product::class);
+    public function item() {
+        return $this->belongsTo(Item::class);
     }
 }

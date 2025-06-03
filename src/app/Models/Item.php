@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class Item extends Model
 {
     use HasFactory;
 
@@ -21,8 +21,8 @@ class Product extends Model
         return $this->belongsToMany(Category::class);
     }
 
-    public function productCondition() {
-        return $this->belongsTo(ProductCondition::class);
+    public function itemCondition() {
+        return $this->belongsTo(ItemCondition::class);
     }
 
     public function purchase() {

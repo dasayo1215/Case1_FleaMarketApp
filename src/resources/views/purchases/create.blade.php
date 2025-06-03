@@ -9,7 +9,7 @@
 
         <div class="wrapper-1">
             <div class="wrapper-1-1">
-                <img class="image-square" src="{{ asset('storage/products/' . $item->image_filename) }}"
+                <img class="image-square" src="{{ asset('storage/items/' . $item->image_filename) }}"
                     alt="{{ $item->name }}">
                 <div class="item-detail">
                     <h2 class="content__heading">{{ $item->name }}</h2>

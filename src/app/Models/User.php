@@ -59,4 +59,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification() {
         $this->notify(new JapaneseVerifyEmail());
     }
+
+    public function likedItems() {
+        return $this->belongsToMany(Item::class, 'likes')->withTimestamps();
+    }
 }

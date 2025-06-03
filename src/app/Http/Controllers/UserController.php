@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
-use App\Models\Product;
+use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\ProfileRequest;
@@ -22,18 +22,20 @@ class UserController extends Controller
     }
 
     public function purchasedItems(){
-        // 購入した商品を表示させる
+        // 購入した商品を表示させる(購入した順)
         $user = Auth::user();
-        $items = Product::whereHas('purchase', function($query) use ($user) {
+        $items = Item::whereHas('purchase', function($query) use ($user) {
             $query->where('buyer_id', $user->id)->whereNotNull('completed_at');
-        })->with('purchase')->latest()->get();
+        })->with('purchase')->latest()->get()
+            ->sortByDesc(fn($item) => $item->purchase->completed_at)
+            ->values();
         return view('users.show', compact('items', 'user'));
     }
 
     public function ListedItems(){
-        // 出品した商品を表示させる
+        // 出品した商品を表示させる(出品した順)
         $user = Auth::user();
-        $items = Product::where('seller_id', $user->id)
+        $items = Item::where('seller_id', $user->id)
         ->with('purchase')
         ->latest()
         ->get();

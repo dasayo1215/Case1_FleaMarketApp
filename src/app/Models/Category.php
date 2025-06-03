@@ -17,8 +17,8 @@ class Category extends Model
         return $this->belongsToMany(Category::class);
     }
 
-    public function products(){
-        return $this->belongsToMany(Product::class);
+    public function items(){
+        return $this->belongsToMany(Item::class);
     }
 }
 

@@ -7,7 +7,7 @@
 @section('content')
     <div class="item-content__wrapper">
         <div class="image-container">
-            <img class="image-square" src="{{ asset('storage/products/' . $item->image_filename) }}"
+            <img class="image-square" src="{{ asset('storage/items/' . $item->image_filename) }}"
                 alt="{{ $item->name }}"></img>
             @if ($item->purchase && $item->purchase->completed_at !== null)
                 <div class="sold-label">sold</div>
@@ -15,7 +15,7 @@
         </div>
         <div class="content__detail">
             <div class="content__heading">
-                <h2 class="product-name">{{ $item->name }}</h2>
+                <h2 class="item-name">{{ $item->name }}</h2>
                 <div class="content__brand">{{ $item->brand }}</div>
                 <div class=" content__price">￥ <span class="content__price-num">{{ number_format($item->price) }}</span>（税込）
                 </div>
@@ -70,10 +70,10 @@
                 <a class="content__purchase-btn" href="{{ url('/purchase/' . $item->id) }}">購入手続きへ</a>
             @endif
 
-            <h3 class="product-description">商品説明</h3>
+            <h3 class="item-description">商品説明</h3>
             <div>{{ $item->description }}</div>
 
-            <h3 class="product-info">商品の情報</h3>
+            <h3 class="item-info">商品の情報</h3>
             <table class="info__table">
                 <tr class="info__table-tr table-row1">
                     <th class="info__table-th th-category">カテゴリー</th>
@@ -85,7 +85,7 @@
                 </tr>
                 <tr class="info__table-tr">
                     <th class="info__table-th">商品の状態</th>
-                    <td class="td-state">{{ $item->productCondition->name }}</td>
+                    <td class="td-state">{{ $item->itemCondition->name }}</td>
                 </tr>
             </table>
 

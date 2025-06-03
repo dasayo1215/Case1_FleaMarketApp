@@ -61,31 +61,31 @@
     color: rgb(255,85,85);
 }
 
-.product-container-link {
+.item-container-link {
     text-decoration: none;
     color: inherit;
     margin: 10px;
 }
 
-.product-container {
+.item-container {
     padding: 0px;
     margin: 0px;
     position: relative;
 }
 
-.product-image {
+.item-image {
     width: 200px;
     height: 200px;
     border: solid #ccc 1px;
 }
 
-.product-container-empty {
+.item-container-empty {
     margin: 10px;
     width: 200px;
     border: solid 1px white;
 }
 
-.product-name {
+.item-name {
     width: 200px;
     font-size: 20px;
 }

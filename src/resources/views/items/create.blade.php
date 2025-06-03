@@ -25,8 +25,8 @@
                 <input type="hidden" name="brand" id="hidden-brand" value="{{ old('brand') }}">
                 <input type="hidden" name="description" id="hidden-description" value="{{ old('description') }}">
                 <input type="hidden" name="price" id="hidden-price" value="{{ old('price') }}">
-                <input type="hidden" name="product_condition_id" id="hidden-product_condition_id"
-                    value="{{ old('product_condition_id') }}">
+                <input type="hidden" name="item_condition_id" id="hidden-item_condition_id"
+                    value="{{ old('item_condition_id') }}">
                 @foreach (old('category_id', []) as $id)
                     <input type="hidden" name="category_id[]" value="{{ $id }}">
                 @endforeach
@@ -59,20 +59,20 @@
                 @enderror
             </p>
 
-            <label class="content-form__label" for="product_condition_id">商品の状態</label>
-            <select class="content-form__input content-form__select" name="product_condition_id" id="product_condition_id">
+            <label class="content-form__label" for="item_condition_id">商品の状態</label>
+            <select class="content-form__input content-form__select" name="item_condition_id" id="item_condition_id">
                 <option value="" disabled
-                    {{ old('product_condition_id') ? '' : 'selected' }}>
+                    {{ old('item_condition_id') ? '' : 'selected' }}>
                     選択してください</option>
                 @foreach ($conditions as $condition)
                     <option value="{{ $condition->id }}"
-                        {{ (old('product_condition_id')) == $condition->id ? 'selected' : '' }}>
+                        {{ (old('item_condition_id')) == $condition->id ? 'selected' : '' }}>
                         {{ $condition->name }}
                     </option>
                 @endforeach
             </select>
             <p class="content-form__error-message">
-                @error('product_condition_id')
+                @error('item_condition_id')
                     {{ $message }}
                 @enderror
             </p>
@@ -150,7 +150,7 @@
                 type: 'text'
             },
             {
-                id: 'product_condition_id',
+                id: 'item_condition_id',
                 type: 'select'
             },
         ];

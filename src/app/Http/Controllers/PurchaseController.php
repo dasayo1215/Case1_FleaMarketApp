@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Product;
+use App\Models\Item;
 use App\Models\PaymentMethod;
 use App\Models\Purchase;
 use Illuminate\Support\Facades\Auth;
@@ -14,19 +14,19 @@ use Stripe\Stripe;
 class PurchaseController extends Controller
 {
     public function showPurchaseForm(Request $request, $itemId){
-        $item = Product::with('productCondition')->findOrFail($itemId);
+        $item = Item::with('itemCondition')->findOrFail($itemId);
         $paymentMethods = PaymentMethod::all();
         $user = Auth::user();
 
         // 既に仮保存されている購入レコードがあるか検索
-        $purchase = Purchase::where('product_id', $item->id)
+        $purchase = Purchase::where('item_id', $item->id)
             ->whereNull('completed_at')
             ->first();
 
         if (!$purchase) {
             $data = [
                 'buyer_id' => $user->id,
-                'product_id' => $item->id,
+                'item_id' => $item->id,
                 'purchase_price' => $item->price,
             ];
             if (!empty($user->postal_code)) {
@@ -59,7 +59,7 @@ class PurchaseController extends Controller
         \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
 
         $user = Auth::user();
-        $purchase = Purchase::where('product_id', $itemId)
+        $purchase = Purchase::where('item_id', $itemId)
             ->where('buyer_id', $user->id)
             ->whereNull('completed_at')
             ->firstOrFail();
@@ -99,9 +99,9 @@ class PurchaseController extends Controller
                 'price_data' => [
                     'currency' => 'jpy',
                     'product_data' => [
-                        'name' => $purchase->product->name
+                        'name' => $purchase->item->name
                     ],
-                    'unit_amount' => $purchase->product->price,
+                    'unit_amount' => $purchase->item->price,
                 ],
                 'quantity' => 1,
             ]],
@@ -120,7 +120,7 @@ class PurchaseController extends Controller
     }
 
     public function showAddressForm($itemId){
-        $purchase = Purchase::where('product_id', $itemId)
+        $purchase = Purchase::where('item_id', $itemId)
             ->whereNull('completed_at')
             ->firstOrFail();
 
@@ -130,7 +130,7 @@ class PurchaseController extends Controller
     public function updateAddress(AddressRequest $request, $itemId){
         $data = $request->validated();
 
-        $purchase = Purchase::where('product_id', $itemId)
+        $purchase = Purchase::where('item_id', $itemId)
             ->whereNull('completed_at')
             ->firstOrFail();
 
@@ -139,7 +139,7 @@ class PurchaseController extends Controller
         $purchase->building = $data['building'];
         $purchase->save();
 
-        return redirect()->route('purchase.show', $purchase->product_id);
+        return redirect()->route('purchase.show', $purchase->item_id);
     }
 
     public function success() {

@@ -24,21 +24,21 @@
     </div>
     <div class="content__wrapper3">
         @foreach ($items as $item)
-            <a class="product-container-link" href="{{ url('/item/' . $item->id) }}">
-                <div class="product-container">
-                    <img class="product-image" src="{{ asset('storage/products/' . $item->image_filename) }}"
+            <a class="item-container-link" href="{{ url('/item/' . $item->id) }}">
+                <div class="item-container">
+                    <img class="item-image" src="{{ asset('storage/items/' . $item->image_filename) }}"
                         alt="{{ $item->name }}">
                     @if ($item->purchase && $item->purchase->completed_at !== null)
                         <div class="sold-label">Sold</div>
                     @endif
-                    <div class="product-name">{{ $item->name }}</div>
+                    <div class="item-name">{{ $item->name }}</div>
                 </div>
             </a>
         @endforeach
 
         {{-- 各商品を適度に間隔開けて左揃えにするためのダミー --}}
         @for ($i = 0; $i < 5; $i++)
-            <div class="product-container-empty"></div>
+            <div class="item-container-empty"></div>
         @endfor
     </div>
 @endsection('content')
