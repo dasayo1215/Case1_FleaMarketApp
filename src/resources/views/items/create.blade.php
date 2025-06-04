@@ -9,30 +9,20 @@
         <h2 class="content__heading">商品の出品</h2>
         <label class="content-form__label" for="image">商品画像</label>
         <div class="image-wrapper">
-            <form class="image-form" action="/sell/image" method="post" enctype="multipart/form-data" id="imageForm">
+            <form class="image-form" id="imageUploadForm" enctype="multipart/form-data">
                 @csrf
-                @if (session('sell_uploaded_image_path'))
-                    <img class="uploaded-image"
-                        src="{{ asset('storage/' . session('sell_uploaded_image_path')) }}?v={{ time() }}"
+                @if (old('sell_uploaded_image_path'))
+                    <img class="uploaded-image" id="preview"
+                        src="{{ asset('storage/' . old('sell_uploaded_image_path')) }}?v={{ time() }}"
                         alt="アップロード画像">
+                @else
+                    <img class="uploaded-image" id="preview" src="" alt="" style="display: none;">
                 @endif
-                <label class="image-label" for="image">画像を選択する</label>
-                <input class="image-input-hidden" type="file" id="image" name="image"
-                    onchange="this.form.submit()">
-
-                {{-- 他のフォームの値をhiddenで送信 --}}
-                <input type="hidden" name="name" id="hidden-name" value="{{ old('name') }}">
-                <input type="hidden" name="brand" id="hidden-brand" value="{{ old('brand') }}">
-                <input type="hidden" name="description" id="hidden-description" value="{{ old('description') }}">
-                <input type="hidden" name="price" id="hidden-price" value="{{ old('price') }}">
-                <input type="hidden" name="item_condition_id" id="hidden-item_condition_id"
-                    value="{{ old('item_condition_id') }}">
-                @foreach (old('category_id', []) as $id)
-                    <input type="hidden" name="category_id[]" value="{{ $id }}">
-                @endforeach
+                <label class="image-label" for="imageInput">画像を選択する</label>
+                <input class="image-input-hidden" type="file" id="imageInput" name="image">
             </form>
         </div>
-        <p class="content-form__error-message">
+        <p class="content-form__error-message image-error">
             @foreach (['image', 'sell_uploaded_image_path'] as $field)
                 @error($field)
                     {{ $message }}
@@ -61,12 +51,11 @@
 
             <label class="content-form__label" for="item_condition_id">商品の状態</label>
             <select class="content-form__input content-form__select" name="item_condition_id" id="item_condition_id">
-                <option value="" disabled
-                    {{ old('item_condition_id') ? '' : 'selected' }}>
+                <option value="" disabled {{ old('item_condition_id') ? '' : 'selected' }}>
                     選択してください</option>
                 @foreach ($conditions as $condition)
                     <option value="{{ $condition->id }}"
-                        {{ (old('item_condition_id')) == $condition->id ? 'selected' : '' }}>
+                        {{ old('item_condition_id') == $condition->id ? 'selected' : '' }}>
                         {{ $condition->name }}
                     </option>
                 @endforeach
@@ -79,16 +68,14 @@
 
             <h3 class="item__title">商品名と説明</h3>
             <label class="content-form__label" for="name">商品名</label>
-            <input class="content-form__input" type="text" name="name" id="name"
-                value="{{ old('name') }}">
+            <input class="content-form__input" type="text" name="name" id="name" value="{{ old('name') }}">
             <p class="content-form__error-message">
                 @error('name')
                     {{ $message }}
                 @enderror
             </p>
             <label class="content-form__label" for="brand">ブランド名</label>
-            <input class="content-form__input" type="text" name="brand" id="brand"
-                value="{{ old('brand') }}">
+            <input class="content-form__input" type="text" name="brand" id="brand" value="{{ old('brand') }}">
             <p class="content-form__error-message">
                 @error('brand')
                     {{ $message }}
@@ -108,7 +95,7 @@
                 <span class="prefix">¥</span>
                 <input class="price-input" type="text" name="price" inputmode="numeric" id="price"
                     value="{{ old('price') }}">
-                <script>
+                <script> //コンマの処理
                     const input = document.getElementById('price');
                     input.addEventListener('input', function() {
                         let value = input.value.replace(/,/g, '');
@@ -123,70 +110,60 @@
                     {{ $message }}
                 @enderror
             </p>
-            @if (session()->has('sell_uploaded_image_path'))
-                <input type="hidden" name="sell_uploaded_image_path" value="{{ session('sell_uploaded_image_path') }}">
-            @endif
+            <input type="hidden" name="sell_uploaded_image_path" id="hidden_image_path"
+                value="{{ old('sell_uploaded_image_path') }}">
             <input class="content-form__btn" type="submit" value="出品する">
         </form>
     </div>
-@endsection('content')
+@endsection
 
 @section('scripts')
     <script>
-        const syncFields = [{
-                id: 'name',
-                type: 'text'
-            },
-            {
-                id: 'brand',
-                type: 'text'
-            },
-            {
-                id: 'description',
-                type: 'textarea'
-            },
-            {
-                id: 'price',
-                type: 'text'
-            },
-            {
-                id: 'item_condition_id',
-                type: 'select'
-            },
-        ];
+        // 画像アップロード非同期処理
+        document.getElementById('imageInput').addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
 
-        syncFields.forEach(field => {
-            const input = document.getElementById(field.id);
-            const hidden = document.getElementById('hidden-' + field.id);
-            if (input && hidden) {
-                input.addEventListener('input', () => {
-                    hidden.value = input.value;
-                });
-            }
-        });
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('_token', document.querySelector('input[name="_token"]').value);
 
-        // カテゴリ（checkbox）選択の同期
-        const categoryInputs = document.querySelectorAll('.category-input');
-        categoryInputs.forEach(input => {
-            input.addEventListener('change', () => {
-                const form = document.getElementById('imageForm');
-                // 一度すべての category_id[] hidden を削除
-                document.querySelectorAll('input[name="category_id[]"]').forEach(e => {
-                    if (e.closest('form') === form) {
-                        e.remove();
+            fetch('/sell/image', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const errorEl = document.querySelector('.image-error');
+
+                    if (data.success) {
+                        const preview = document.getElementById('preview');
+                        preview.src = data.image_url + '?v=' + Date.now();
+                        preview.style.display = 'block';
+
+                        // hidden input に path を保存
+                        const hiddenPathInput = document.getElementById('hidden_image_path');
+                        if (hiddenPathInput) {
+                            hiddenPathInput.value = data.path;
+                        }
+
+                        if (errorEl) {
+                            errorEl.textContent = '';
+                        }
+
+                    } else if (data.errors?.image) {
+                        if (errorEl) {
+                            errorEl.textContent = data.errors.image.join('\n');
+                        }
+                    } else {
+                        if (errorEl) {
+                            errorEl.textContent = '画像のアップロードに失敗しました';
+                        }
                     }
                 });
-                // チェックされているものだけ追加
-                categoryInputs.forEach(i => {
-                    if (i.checked) {
-                        const hidden = document.createElement('input');
-                        hidden.type = 'hidden';
-                        hidden.name = 'category_id[]';
-                        hidden.value = i.value;
-                        form.appendChild(hidden);
-                    }
-                });
-            });
         });
     </script>
 @endsection

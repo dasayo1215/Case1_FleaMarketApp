@@ -20,10 +20,10 @@
             </div>
 
             {{-- 支払い方法選択フォーム --}}
-            <form method="GET" action="{{ url('/purchase/' . $item->id) }}">
+            {{-- <form method="GET" action="{{ url('/purchase/' . $item->id) }}" id="payment-form"> --}}
+            <div id="payment-form">
                 <h3 class="item__title purchase-way">支払い方法</h3>
-                <select class="content-form__input content-form__select" name="payment_method"
-                    onchange="this.form.submit()">
+                <select class="content-form__input content-form__select" name="payment_method" id="payment-method">
                     <option value="" disabled {{ session('selected_payment_method_id') ? '' : 'selected' }}>選択してください
                     </option>
                     @foreach ($paymentMethods as $paymentMethod)
@@ -33,7 +33,8 @@
                         </option>
                     @endforeach
                 </select>
-            </form>
+                {{-- </form> --}}
+            </div>
             <p class="content-form__error-message payment-method-error">
                 @error('payment_method')
                     {{ $message }}
@@ -74,7 +75,7 @@
                     </tr>
                     <tr>
                         <th class="purchase-table__th">支払い方法</th>
-                        <td class="purchase-table__td">
+                        <td class="purchase-table__td purchase-method-display">
                             {{ optional($paymentMethods->firstWhere('id', session('selected_payment_methods')[$item->id] ?? null))->name ?? '未選択' }}
                         </td>
                     </tr>
@@ -89,3 +90,55 @@
         </div>
     </div>
 @endsection('content')
+
+@section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentSelect = document.getElementById('payment-method');
+            const itemId = @json($item->id);
+            const methodDisplayTd = document.querySelector('.purchase-method-display');
+
+
+            paymentSelect.addEventListener('change', function() {
+                const selectedValue = paymentSelect.value;
+                const selectedText = paymentSelect.options[paymentSelect.selectedIndex].text;
+
+                // 1. まず画面上の表示を即時更新
+                if (methodDisplayTd) {
+                    methodDisplayTd.textContent = selectedText;
+                }
+
+                // 2. hidden input にも反映
+                const hiddenInput = document.querySelector('input[name="payment_method"]');
+                if (hiddenInput) {
+                    hiddenInput.value = selectedValue;
+                }
+
+                // 3. Laravel 側にもセッション反映
+                const formData = new FormData();
+                formData.append('payment_method', selectedValue);
+
+                fetch(`/purchase/${itemId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error('通信エラー');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (!data.success) {
+                            alert('支払い方法の保存に失敗しました。');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('通信失敗:', error);
+                    });
+            });
+        });
+    </script>
+@endsection('scripts')

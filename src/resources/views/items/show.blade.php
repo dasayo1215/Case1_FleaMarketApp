@@ -29,7 +29,7 @@
                         @auth
                             <form class="like-form" method="POST" action="{{ route('like', $item->id) }}">
                                 @csrf
-                                <button class="like-button" type="submit">
+                                <button class="like-button" data-item-id="{{ $item->id }}">
                                     <img class="content__like-img"
                                         src="{{ $isLiked ? asset('storage/assets/star-on.png') : asset('storage/assets/star-off.png') }}"
                                         alt="いいね">
@@ -42,7 +42,7 @@
                                     alt="いいね">
                             </div>
                         @endauth
-                        <div class="content__like-num">{{ $likeCount }}</div>
+                        <div class="content__like-num" id="like-count-{{ $item->id }}">{{ $likeCount }}</div>
                     </div>
                     <div class="content__comment">
                         <img class="content__comment-img" src="{{ asset('storage/assets/bubble.png') }}" alt="ロゴ">
@@ -106,9 +106,9 @@
                 <div class="comment__content">{{ $comment->comment }}</div>
             @endforeach
 
-            <label class="content-form__label" for="comment">商品へのコメント</label>
-            <form method="POST" action="{{ route('comment', $item->id) }}">
+            <form method="POST" action="{{ route('comment', $item->id) }}" id="comment-form">
                 @csrf
+                <label class="content-form__label" for="comment">商品へのコメント</label>
                 <textarea class="content-form__textarea" name="comment" id="comment" cols="30" rows="10"></textarea>
                 <p class="content-form__error-message">
                     @error('comment')
@@ -118,10 +118,82 @@
                 @if ($purchase && !is_null($purchase->completed_at))
                     <div class="comment-unavailable">コメントできません</div>
                 @else
-                    <input class="content-form__btn" type="submit" value="コメントを送信する">
+                    <input class="content-form__btn" type="submit" value="コメントを送信する" id="submit-comment">
                 @endif
             </form>
 
         </div>
     </div>
 @endsection('content')
+
+@section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.like-button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const itemId = this.dataset.itemId;
+                    fetch(`/item/${itemId}/like`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').content,
+                                'Accept': 'application/json'
+                            },
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            const img = this.querySelector('img');
+                            img.src = data.liked ? '/storage/assets/star-on.png' :
+                                '/storage/assets/star-off.png';
+                            document.getElementById(`like-count-${itemId}`).textContent = data
+                                .like_count;
+                        })
+                        .catch(error => console.error('通信失敗', error));
+                });
+            });
+
+            // コメント送信フォーム非同期処理
+            const commentForm = document.getElementById('comment-form');
+            if (commentForm) {
+                commentForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    fetch(this.action, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content,
+                                'Accept': 'application/json'
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const c = data.comment;
+                                const commentHtml = `
+                                <div class="comment__user">
+                                    <div class="user-image-container">
+                                        ${c.user_image
+                                            ? `<img class="comment__user-image" src="/storage/users/${c.user_image}" alt="${c.user_name}" class="user-icon">`
+                                            : `<div class="comment__user-image"></div>`}
+                                    </div>
+                                    <div class="comment__user-name">${c.user_name}</div>
+                                </div>
+                                <div class="comment__content">${c.text}</div>
+                            `;
+                                commentForm.insertAdjacentHTML('beforebegin', commentHtml);
+                                document.getElementById('comment').value = '';
+                            } else {
+                                alert('コメントの送信に失敗しました。');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('通信エラー:', error);
+                        });
+                });
+            }
+        });
+    </script>
+@endsection('scripts')

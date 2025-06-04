@@ -42,7 +42,7 @@ class PurchaseController extends Controller
         }
 
         // paymentMethodIdをセッションに保存
-        if ($request->has('payment_method')) {
+        if ($request->filled('payment_method')) {
             $paymentMethodId = $request->input('payment_method');
 
             if ($paymentMethodId !== null && $paymentMethodId !== '') {
@@ -50,6 +50,19 @@ class PurchaseController extends Controller
                 $selectedPaymentMethods[$item->id] = $paymentMethodId;
                 session(['selected_payment_methods' => $selectedPaymentMethods]);
             }
+        }
+
+        if ($request->ajax() && $request->isMethod('post')) {
+            // fetchからのPOSTだったらセッションだけ保存して終了
+            $paymentMethodId = $request->input('payment_method');
+        
+            if ($paymentMethodId !== null && $paymentMethodId !== '') {
+                $selectedPaymentMethods = session('selected_payment_methods', []);
+                $selectedPaymentMethods[$item->id] = $paymentMethodId;
+                session(['selected_payment_methods' => $selectedPaymentMethods]);
+            }
+        
+            return response()->json(['success' => true]);
         }
 
         return view('purchases.create', compact('item', 'user', 'paymentMethods', 'purchase'));

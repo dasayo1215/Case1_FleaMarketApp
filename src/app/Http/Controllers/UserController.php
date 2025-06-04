@@ -66,18 +66,17 @@ class UserController extends Controller
 
         $user->update($data);
 
-        session()->forget('profile_uploaded_image_path');
-
         return redirect('/');
     }
 
     public function uploadImage(ProfileRequest $request) {
         $path = $request->file('image')->store('tmp', 'public');
 
-        // セッションに保存
-        session(['profile_uploaded_image_path' => $path]);
-        session()->flashInput($request->except('image'));
-
-        return redirect()->route('profile.edit');
+        // JSONレスポンスを返す
+        return response()->json([
+            'success' => true,
+            'image_url' => asset('storage/' . $path),
+            'path' => $path,
+        ]);
     }
 }

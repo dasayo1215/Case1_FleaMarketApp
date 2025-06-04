@@ -69,32 +69,52 @@ class ItemController extends Controller
 
     public function storeComment(CommentRequest $request, $itemId){
         $request->validated();
-
-        Comment::create([
+    
+        $comment = Comment::create([
             'user_id' => Auth::id(),
             'item_id' => $itemId,
             'comment' => $request->comment,
         ]);
-
-        return redirect()->back();
+    
+        // ユーザー情報も一緒に返す（画像・名前のため）
+        $comment->load('user');
+    
+        return response()->json([
+            'success' => true,
+            'comment' => [
+                'user_name' => $comment->user->name,
+                'user_image' => $comment->user->image_filename,
+                'text' => $comment->comment,
+            ],
+        ]);
     }
 
-    public function toggleLike($itemId){
+    public function toggleLike(Request $request, $itemId){
         $user = Auth::user();
+        $item = Item::findOrFail($itemId);
         $like = Like::where('user_id', $user->id)
                     ->where('item_id', $itemId)
                     ->first();
 
         if ($like) {
             $like->delete();
+            $liked = false;
         } else {
             Like::create([
                 'user_id' => $user->id,
                 'item_id' => $itemId,
             ]);
+            $liked = true;
         }
 
-        return redirect()->back();
+        if ($request->expectsJson()) {
+            return response()->json([
+                'liked' => $liked,
+                'like_count' => $item->likes()->count(),
+            ]);
+        }
+
+        return back();
     }
 
     public function showSellForm(){
@@ -133,18 +153,16 @@ class ItemController extends Controller
 
         $item->categories()->sync($validated['category_id']);
 
-        session()->forget(['sell_uploaded_image_path']);
-
         return redirect('/mypage');
     }
 
     public function uploadImage(UploadImageRequest $request) {
         $path = $request->file('image')->store('tmp', 'public');
 
-        // セッションに保存
-        session(['sell_uploaded_image_path' => $path]);
-        session()->flashInput($request->except('image'));
-
-        return redirect()->route('sell');
+        return response()->json([
+            'success' => true,
+            'path' => $path,
+            'image_url' => asset('storage/' . $path),
+        ]);
     }
 }

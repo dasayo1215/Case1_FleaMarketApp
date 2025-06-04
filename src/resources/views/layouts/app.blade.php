@@ -7,6 +7,7 @@
     <title>COACHTECH</title>
     <link rel="stylesheet" href="{{ asset('css/common.css') }}">
     @yield('css')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body>
@@ -20,10 +21,10 @@
                 <ul class="header-nav">
                     <li class="header-nav-item-search">
                         <form class="header-nav-search-form" action="{{ route('index') }}" method="GET">
-                            <input class="header-nav-search-input" type="text" name="keyword" placeholder="なにをお探しですか？"
-                                value="{{ request('keyword') }}">
-                                <input type="hidden" name="tab" value="{{ $tab ?? '' }}">
-                                <button class="header-nav-search-btn" type="submit">検索</button>
+                            <input class="header-nav-search-input" type="text" name="keyword"
+                                placeholder="なにをお探しですか？" value="{{ request('keyword') }}">
+                            <input type="hidden" name="tab" value="{{ $tab ?? '' }}">
+                            <button class="header-nav-search-btn" type="submit">検索</button>
                         </form>
                     </li>
 
@@ -37,10 +38,7 @@
                     @endauth
                     @guest
                         <li class="header-nav-item">
-                            <form class="header-nav-auth-form" action="/logout" method="post">
-                                @csrf
-                                <a class="header-nav-auth-btn" href="{{ route('login') }}">ログイン</a>
-                            </form>
+                            <a class="header-nav-auth-btn" href="{{ route('login') }}">ログイン</a>
                         </li>
                     @endguest
 
