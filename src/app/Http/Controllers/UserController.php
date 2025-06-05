@@ -12,9 +12,9 @@ use App\Http\Requests\AddressRequest;
 class UserController extends Controller
 {
     public function showProfile(Request $request){
-        $tab = $request->query('tab');
+        $page = $request->query('page');
 
-        if($tab === 'buy'){
+        if($page === 'buy'){
             return $this->purchasedItems();
         }else{
             return $this->listedItems();

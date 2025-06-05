@@ -5,9 +5,9 @@
 @endsection
 
 @section('content')
-    <div class="content__wrapper">
-        <h2 class="content__heading">商品の出品</h2>
-        <label class="content-form__label" for="image">商品画像</label>
+    <div class="content-wrapper">
+        <h2 class="content-heading">商品の出品</h2>
+        <label class="content-form-label" for="image">商品画像</label>
         <div class="image-wrapper">
             <form class="image-form" id="imageUploadForm" enctype="multipart/form-data">
                 @csrf
@@ -22,7 +22,7 @@
                 <input class="image-input-hidden" type="file" id="imageInput" name="image">
             </form>
         </div>
-        <p class="content-form__error-message image-error">
+        <p class="content-form-error-message image-error">
             @foreach (['image', 'sell_uploaded_image_path'] as $field)
                 @error($field)
                     {{ $message }}
@@ -30,10 +30,10 @@
             @endforeach
         </p>
 
-        <form class="content-form__form" action="/sell" method="post">
+        <form class="content-form-form" action="/sell" method="post">
             @csrf
-            <h3 class="item__title">商品の詳細</h3>
-            <label class="content-form__label">カテゴリー</label>
+            <h3 class="item-title">商品の詳細</h3>
+            <label class="content-form-label">カテゴリー</label>
             <div class="categories">
                 @foreach ($categories as $category)
                     <label class="category-button">
@@ -43,14 +43,14 @@
                     </label>
                 @endforeach
             </div>
-            <p class="content-form__error-message">
+            <p class="content-form-error-message">
                 @error('category_id')
                     {{ $message }}
                 @enderror
             </p>
 
-            <label class="content-form__label" for="item_condition_id">商品の状態</label>
-            <select class="content-form__input content-form__select" name="item_condition_id" id="item_condition_id">
+            <label class="content-form-label" for="item_condition_id">商品の状態</label>
+            <select class="content-form-input content-form-select" name="item_condition_id" id="item_condition_id">
                 <option value="" disabled {{ old('item_condition_id') ? '' : 'selected' }}>
                     選択してください</option>
                 @foreach ($conditions as $condition)
@@ -60,37 +60,37 @@
                     </option>
                 @endforeach
             </select>
-            <p class="content-form__error-message">
+            <p class="content-form-error-message">
                 @error('item_condition_id')
                     {{ $message }}
                 @enderror
             </p>
 
-            <h3 class="item__title">商品名と説明</h3>
-            <label class="content-form__label" for="name">商品名</label>
-            <input class="content-form__input" type="text" name="name" id="name" value="{{ old('name') }}">
-            <p class="content-form__error-message">
+            <h3 class="item-title">商品名と説明</h3>
+            <label class="content-form-label" for="name">商品名</label>
+            <input class="content-form-input" type="text" name="name" id="name" value="{{ old('name') }}">
+            <p class="content-form-error-message">
                 @error('name')
                     {{ $message }}
                 @enderror
             </p>
-            <label class="content-form__label" for="brand">ブランド名</label>
-            <input class="content-form__input" type="text" name="brand" id="brand" value="{{ old('brand') }}">
-            <p class="content-form__error-message">
+            <label class="content-form-label" for="brand">ブランド名</label>
+            <input class="content-form-input" type="text" name="brand" id="brand" value="{{ old('brand') }}">
+            <p class="content-form-error-message">
                 @error('brand')
                     {{ $message }}
                 @enderror
             </p>
 
-            <label class="content-form__label" for="description">商品の説明</label>
-            <textarea class="content-form__textarea" name="description" id="description">{{ old('description') }}</textarea>
-            <p class="content-form__error-message">
+            <label class="content-form-label" for="description">商品の説明</label>
+            <textarea class="content-form-textarea" name="description" id="description">{{ old('description') }}</textarea>
+            <p class="content-form-error-message">
                 @error('description')
                     {{ $message }}
                 @enderror
             </p>
 
-            <label class="content-form__label" for="price">販売価格</label>
+            <label class="content-form-label" for="price">販売価格</label>
             <div class="input-wrapper">
                 <span class="prefix">¥</span>
                 <input class="price-input" type="text" name="price" inputmode="numeric" id="price"
@@ -105,14 +105,14 @@
                     });
                 </script>
             </div>
-            <p class="content-form__error-message">
+            <p class="content-form-error-message">
                 @error('price')
                     {{ $message }}
                 @enderror
             </p>
             <input type="hidden" name="sell_uploaded_image_path" id="hidden_image_path"
                 value="{{ old('sell_uploaded_image_path') }}">
-            <input class="content-form__btn" type="submit" value="出品する">
+            <input class="content-form-btn" type="submit" value="出品する">
         </form>
     </div>
 @endsection

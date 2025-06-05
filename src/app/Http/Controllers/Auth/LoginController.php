@@ -21,7 +21,7 @@ class LoginController extends Controller
             'password' => $data['password'],
         ])) {
             // ログイン成功時
-            return redirect('/?tab=mylist');
+            return redirect('/?page=mylist');
         }
 
         // ログイン失敗時

@@ -5,11 +5,11 @@
 @endsection
 
 @section('content')
-    <div class="tab">
-        <a class="tab__recommend {{ $tab !== 'mylist' ? 'active' : '' }}" href="{{ route('index', ['tab' => null, 'keyword' => request('keyword')]) }}">おすすめ</a>
-        <a class="tab__mylist {{ $tab === 'mylist' ? 'active' : '' }}" href="{{ route('index', ['tab' => 'mylist', 'keyword' => request('keyword')]) }}">マイリスト</a>
+    <div class="page">
+        <a class="page-recommend {{ $page !== 'mylist' ? 'active' : '' }}" href="{{ route('index', ['page' => null, 'keyword' => request('keyword')]) }}">おすすめ</a>
+        <a class="page-mylist {{ $page === 'mylist' ? 'active' : '' }}" href="{{ route('index', ['page' => 'mylist', 'keyword' => request('keyword')]) }}">マイリスト</a>
     </div>
-    <div class="content__wrapper3">
+    <div class="content-wrapper3">
         @foreach ($items as $item)
             <a class="item-container-link" href="{{ url('/item/' . $item->id) }}">
                 <div class="item-container">

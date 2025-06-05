@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    <div class="content__wrapper4">
+    <div class="content-wrapper4">
         @if (session('message'))
             <div class="verify-text">
                 {{ session('message') }}

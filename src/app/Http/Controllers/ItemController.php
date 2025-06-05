@@ -17,10 +17,10 @@ use Illuminate\Support\Facades\Storage;
 class ItemController extends Controller
 {
     public function index(Request $request) {
-        $tab = $request->query('tab');
+        $page = $request->query('page');
         $keyword = $request->query('keyword');
 
-        if($tab === 'mylist'){
+        if($page === 'mylist'){
             return $this->mylist($request);
         }
 
@@ -38,7 +38,7 @@ class ItemController extends Controller
 
         $items = $query->latest()->get();
 
-        return view('items.index', compact('items', 'keyword', 'tab'));
+        return view('items.index', compact('items', 'keyword', 'page'));
     }
 
     public function mylist(Request $request) {
@@ -56,9 +56,9 @@ class ItemController extends Controller
                 ->get();
         }
 
-        $tab='mylist';
+        $page='mylist';
 
-        return view('items.index', compact('items', 'keyword', 'tab'));
+        return view('items.index', compact('items', 'keyword', 'page'));
     }
 
     public function show($itemId){

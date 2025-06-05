@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    <div class="content__wrapper4">
+    <div class="content-wrapper4">
         <div class="verify-text">
             <p>{{ $message }}</p>
         </div>

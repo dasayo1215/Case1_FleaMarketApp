@@ -15,14 +15,14 @@
         <a class="edit-profile" href="/mypage/profile">プロフィールを編集</a>
     </div>
 
-    <div class="tab">
+    <div class="page">
         @php
-            $activeTab = request('tab') ?? 'sell';
+            $activePage = request('page') ?? 'sell';
         @endphp
-        <a class="tab__sell {{ $activeTab === 'sell' ? 'active' : '' }}" href="{{ url('/mypage?tab=sell') }}">出品した商品</a>
-        <a class="tab__buy {{ $activeTab === 'buy' ? 'active' : '' }}" href="{{ url('/mypage?tab=buy') }}">購入した商品</a>
+        <a class="page-sell {{ $activePage === 'sell' ? 'active' : '' }}" href="{{ url('/mypage?page=sell') }}">出品した商品</a>
+        <a class="page-buy {{ $activePage === 'buy' ? 'active' : '' }}" href="{{ url('/mypage?page=buy') }}">購入した商品</a>
     </div>
-    <div class="content__wrapper3">
+    <div class="content-wrapper3">
         @foreach ($items as $item)
             <a class="item-container-link" href="{{ url('/item/' . $item->id) }}">
                 <div class="item-container">

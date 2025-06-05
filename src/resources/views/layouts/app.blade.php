@@ -8,11 +8,14 @@
     <link rel="stylesheet" href="{{ asset('css/common.css') }}">
     @yield('css')
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+        const IS_LOGGED_IN = @json(Auth::check());
+    </script>
 </head>
 
 <body>
-    <div class="app">
-        <header class="header">
+    <header class="header">
+        <div class="header-wrapper">
             <h1 class="sr-only">COACHTECH</h1>
             <a class="header-logo" href="{{ url('/') }}">
                 <img class="header-logo-img" src="{{ asset('storage/assets/logo.svg') }}" alt="ロゴ">
@@ -23,7 +26,7 @@
                         <form class="header-nav-search-form" action="{{ route('index') }}" method="GET">
                             <input class="header-nav-search-input" type="text" name="keyword"
                                 placeholder="なにをお探しですか？" value="{{ request('keyword') }}">
-                            <input type="hidden" name="tab" value="{{ $tab ?? '' }}">
+                            <input type="hidden" name="page" value="{{ $page ?? '' }}">
                             <button class="header-nav-search-btn" type="submit">検索</button>
                         </form>
                     </li>
@@ -50,10 +53,10 @@
                     </li>
                 </ul>
             @endif
-        </header>
-        <div class="content">
-            @yield('content')
         </div>
+    </header>
+    <div class="content">
+        @yield('content')
     </div>
     @yield('scripts')
 </body>

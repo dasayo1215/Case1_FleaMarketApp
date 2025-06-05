@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    <div class="item-content__wrapper">
+    <div class="item-content-wrapper">
         <div class="image-container">
             <img class="image-square" src="{{ asset('storage/items/' . $item->image_filename) }}"
                 alt="{{ $item->name }}"></img>
@@ -13,24 +13,24 @@
                 <div class="sold-label">sold</div>
             @endif
         </div>
-        <div class="content__detail">
-            <div class="content__heading">
+        <div class="content-detail">
+            <div class="content-heading">
                 <h2 class="item-name">{{ $item->name }}</h2>
-                <div class="content__brand">{{ $item->brand }}</div>
-                <div class=" content__price">￥ <span class="content__price-num">{{ number_format($item->price) }}</span>（税込）
+                <div class="content-brand">{{ $item->brand }}</div>
+                <div class=" content-price">￥ <span class="content-price-num">{{ number_format($item->price) }}</span>（税込）
                 </div>
-                <div class="content__like-comment">
+                <div class="content-like-comment">
                     @php
                         $isLiked = $user ? $item->isLikedBy($user) : false;
                         $likeCount = $item->likes->count();
                         $commentCount = $item->comments->count();
                     @endphp
-                    <div class="content__like">
+                    <div class="content-like">
                         @auth
                             <form class="like-form" method="POST" action="{{ route('like', $item->id) }}">
                                 @csrf
                                 <button class="like-button" data-item-id="{{ $item->id }}">
-                                    <img class="content__like-img"
+                                    <img class="content-like-img"
                                         src="{{ $isLiked ? asset('storage/assets/star-on.png') : asset('storage/assets/star-off.png') }}"
                                         alt="いいね">
                                 </button>
@@ -38,15 +38,15 @@
                         @else
                             {{-- ゲストユーザー：非アクティブ表示 --}}
                             <div class="like-button disabled">
-                                <img class="content__like-img-guest" src="{{ asset('storage/assets/star-off.png') }}"
+                                <img class="content-like-img-guest" src="{{ asset('storage/assets/star-off.png') }}"
                                     alt="いいね">
                             </div>
                         @endauth
-                        <div class="content__like-num" id="like-count-{{ $item->id }}">{{ $likeCount }}</div>
+                        <div class="content-like-num" id="like-count-{{ $item->id }}">{{ $likeCount }}</div>
                     </div>
-                    <div class="content__comment">
-                        <img class="content__comment-img" src="{{ asset('storage/assets/bubble.png') }}" alt="ロゴ">
-                        <div class="content__comment-num">{{ $commentCount }}</div>
+                    <div class="content-comment">
+                        <img class="content-comment-img" src="{{ asset('storage/assets/bubble.png') }}" alt="ロゴ">
+                        <div class="content-comment-num" id="comment-icon-count">{{ $commentCount }}</div>
                     </div>
                 </div>
             </div>
@@ -64,53 +64,55 @@
                 @elseif(!is_null($purchase->completed_at) && $purchase->buyer_id === auth()->id())
                     <div class="purchase-unavailable">お支払いを完了してください</div>
                 @else
-                    <a class="content__purchase-btn" href="{{ url('/purchase/' . $item->id) }}">購入手続きを再開</a>
+                    <a class="content-purchase-btn" href="{{ url('/purchase/' . $item->id) }}">購入手続きを再開</a>
                 @endif
             @else
-                <a class="content__purchase-btn" href="{{ url('/purchase/' . $item->id) }}">購入手続きへ</a>
+                <a class="content-purchase-btn" href="{{ url('/purchase/' . $item->id) }}">購入手続きへ</a>
             @endif
 
             <h3 class="item-description">商品説明</h3>
             <div>{{ $item->description }}</div>
 
             <h3 class="item-info">商品の情報</h3>
-            <table class="info__table">
-                <tr class="info__table-tr table-row1">
-                    <th class="info__table-th th-category">カテゴリー</th>
+            <table class="info-table">
+                <tr class="info-table-tr table-row1">
+                    <th class="info-table-th th-category">カテゴリー</th>
                     <td class="td-category">
                         @foreach ($item->categories as $category)
                             <span class="td-category-span">{{ $category->name }}</span>
                         @endforeach
                     </td>
                 </tr>
-                <tr class="info__table-tr">
-                    <th class="info__table-th">商品の状態</th>
+                <tr class="info-table-tr">
+                    <th class="info-table-th">商品の状態</th>
                     <td class="td-state">{{ $item->itemCondition->name }}</td>
                 </tr>
             </table>
 
-            <h3 class="comment__title">コメント({{ $item->comments->count() }})</h3>
+            <h3 class="comment-title">
+                コメント(<span id="comment-count">{{ $item->comments->count() }}</span>)
+            </h3>
             @foreach ($item->comments as $comment)
-                <div class="comment__user">
+                <div class="comment-user">
                     <div class="user-image-container">
                         @if ($comment->user->image_filename)
-                            <img class="comment__user-image"
+                            <img class="comment-user-image"
                                 src="{{ asset('storage/users/' . $comment->user->image_filename) }}"
                                 alt="{{ $comment->user->image_filename }}" class="user-icon">
                         @else
-                            <div class="comment__user-image"></div>
+                            <div class="comment-user-image"></div>
                         @endif
                     </div>
-                    <div class="comment__user-name">{{ $comment->user->name }}</div>
+                    <div class="comment-user-name">{{ $comment->user->name }}</div>
                 </div>
-                <div class="comment__content">{{ $comment->comment }}</div>
+                <div class="comment-content">{{ $comment->comment }}</div>
             @endforeach
 
             <form method="POST" action="{{ route('comment', $item->id) }}" id="comment-form">
                 @csrf
-                <label class="content-form__label" for="comment">商品へのコメント</label>
-                <textarea class="content-form__textarea" name="comment" id="comment" cols="30" rows="10"></textarea>
-                <p class="content-form__error-message">
+                <label class="content-form-label" for="comment">商品へのコメント</label>
+                <textarea class="content-form-textarea" name="comment" id="comment" cols="30" rows="10"></textarea>
+                <p class="content-form-error-message">
                     @error('comment')
                         {{ $message }}
                     @enderror
@@ -118,7 +120,7 @@
                 @if ($purchase && !is_null($purchase->completed_at))
                     <div class="comment-unavailable">コメントできません</div>
                 @else
-                    <input class="content-form__btn" type="submit" value="コメントを送信する" id="submit-comment">
+                    <input class="content-form-btn" type="submit" value="コメントを送信する" id="submit-comment">
                 @endif
             </form>
 
@@ -158,6 +160,13 @@
             if (commentForm) {
                 commentForm.addEventListener('submit', function(e) {
                     e.preventDefault();
+
+                    // 未ログインならログインページへリダイレクト
+                    if (!IS_LOGGED_IN) {
+                        window.location.href = '/login';
+                        return;
+                    }
+
                     const formData = new FormData(this);
                     fetch(this.action, {
                             method: 'POST',
@@ -173,18 +182,32 @@
                             if (data.success) {
                                 const c = data.comment;
                                 const commentHtml = `
-                                <div class="comment__user">
+                                <div class="comment-user">
                                     <div class="user-image-container">
                                         ${c.user_image
-                                            ? `<img class="comment__user-image" src="/storage/users/${c.user_image}" alt="${c.user_name}" class="user-icon">`
-                                            : `<div class="comment__user-image"></div>`}
+                                            ? `<img class="comment-user-image" src="/storage/users/${c.user_image}" alt="${c.user_name}" class="user-icon">`
+                                            : `<div class="comment-user-image"></div>`}
                                     </div>
-                                    <div class="comment__user-name">${c.user_name}</div>
+                                    <div class="comment-user-name">${c.user_name}</div>
                                 </div>
-                                <div class="comment__content">${c.text}</div>
+                                <div class="comment-content">${c.text}</div>
                             `;
                                 commentForm.insertAdjacentHTML('beforebegin', commentHtml);
                                 document.getElementById('comment').value = '';
+
+                                const commentCountElement = document.getElementById('comment-count');
+                                const commentIconCountElement = document.getElementById(
+                                    'comment-icon-count');
+
+                                if (commentCountElement) {
+                                    const count = parseInt(commentCountElement.textContent);
+                                    commentCountElement.textContent = count + 1;
+                                }
+
+                                if (commentIconCountElement) {
+                                    const iconCount = parseInt(commentIconCountElement.textContent);
+                                    commentIconCountElement.textContent = iconCount + 1;
+                                }
                             } else {
                                 alert('コメントの送信に失敗しました。');
                             }
