@@ -20,7 +20,6 @@
             </div>
 
             {{-- 支払い方法選択フォーム --}}
-            {{-- <form method="GET" action="{{ url('/purchase/' . $item->id) }}" id="payment-form"> --}}
             <div id="payment-form">
                 <h3 class="item-title purchase-way">支払い方法</h3>
                 <select class="content-form-input content-form-select" name="payment_method" id="payment-method">
@@ -28,12 +27,11 @@
                     </option>
                     @foreach ($paymentMethods as $paymentMethod)
                         <option value="{{ $paymentMethod->id }}"
-                            {{ (session('selected_payment_methods')[$item->id] ?? '') == $paymentMethod->id ? 'selected' : '' }}>
+                            {{ $selectedPaymentMethodId == $paymentMethod->id ? 'selected' : '' }}>
                             {{ $paymentMethod->name }}
                         </option>
                     @endforeach
                 </select>
-                {{-- </form> --}}
             </div>
             <p class="content-form-error-message payment-method-error">
                 @error('payment_method')
@@ -76,15 +74,14 @@
                     <tr>
                         <th class="purchase-table-th">支払い方法</th>
                         <td class="purchase-table-td purchase-method-display">
-                            {{ optional($paymentMethods->firstWhere('id', session('selected_payment_methods')[$item->id] ?? null))->name ?? '未選択' }}
+                            {{ optional($paymentMethods->firstWhere('id', $selectedPaymentMethodId))->name ?? '未選択' }}
                         </td>
                     </tr>
                 </table>
                 <input type="hidden" name="postal_code" value="{{ $purchase->postal_code }}">
                 <input type="hidden" name="address" value="{{ $purchase->address }}">
                 <input type="hidden" name="building" value="{{ $purchase->building }}">
-                <input type="hidden" name="payment_method"
-                    value="{{ session('selected_payment_methods')[$item->id] ?? '' }}">
+                <input type="hidden" name="payment_method" value="{{ $selectedPaymentMethodId }}">
                 <input class="content-form-btn" type="submit" value="購入する">
             </form>
         </div>
@@ -97,32 +94,39 @@
             const paymentSelect = document.getElementById('payment-method');
             const itemId = @json($item->id);
             const methodDisplayTd = document.querySelector('.purchase-method-display');
+            const hiddenInput = document.querySelector('input[name="payment_method"]');
 
+            // 初期表示の即時反映（セッションに保存されているもの）
+            const selectedOption = paymentSelect.options[paymentSelect.selectedIndex];
+            if (selectedOption && selectedOption.value) {
+                methodDisplayTd.textContent = selectedOption.text;
+                if (hiddenInput) hiddenInput.value = selectedOption.value;
+            }
 
             paymentSelect.addEventListener('change', function() {
                 const selectedValue = paymentSelect.value;
                 const selectedText = paymentSelect.options[paymentSelect.selectedIndex].text;
 
-                // 1. まず画面上の表示を即時更新
+                // 1. 画面の表示を即時更新
                 if (methodDisplayTd) {
                     methodDisplayTd.textContent = selectedText;
                 }
 
                 // 2. hidden input にも反映
-                const hiddenInput = document.querySelector('input[name="payment_method"]');
                 if (hiddenInput) {
                     hiddenInput.value = selectedValue;
                 }
 
-                // 3. Laravel 側にもセッション反映
+                // 3. セッションに保存（非同期POST）
                 const formData = new FormData();
                 formData.append('payment_method', selectedValue);
 
-                fetch(`/purchase/${itemId}`, {
+                fetch(`/purchase/${itemId}/payment-method`, {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                             'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
                         },
                         body: formData
                     })

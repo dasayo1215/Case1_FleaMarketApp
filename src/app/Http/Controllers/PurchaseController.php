@@ -17,6 +17,7 @@ class PurchaseController extends Controller
         $item = Item::with('itemCondition')->findOrFail($itemId);
         $paymentMethods = PaymentMethod::all();
         $user = Auth::user();
+        $selectedPaymentMethodId = session('selected_payment_method_id', null);
 
         // 既に仮保存されている購入レコードがあるか検索
         $purchase = Purchase::where('item_id', $item->id)
@@ -41,31 +42,26 @@ class PurchaseController extends Controller
             $purchase = Purchase::create($data); // 仮保存
         }
 
-        // paymentMethodIdをセッションに保存
-        if ($request->filled('payment_method')) {
-            $paymentMethodId = $request->input('payment_method');
+        // ↓ 追加：選択された支払い方法IDをビューに渡す
+        $selectedPaymentMethodId = session('selected_payment_method_id', null);
 
-            if ($paymentMethodId !== null && $paymentMethodId !== '') {
-                $selectedPaymentMethods = session('selected_payment_methods', []);
-                $selectedPaymentMethods[$item->id] = $paymentMethodId;
-                session(['selected_payment_methods' => $selectedPaymentMethods]);
-            }
-        }
+        return view('purchases.create', compact(
+            'item',
+            'user',
+            'paymentMethods',
+            'purchase',
+            'selectedPaymentMethodId'
+        ));
+    }
 
-        if ($request->ajax() && $request->isMethod('post')) {
-            // fetchからのPOSTだったらセッションだけ保存して終了
-            $paymentMethodId = $request->input('payment_method');
-        
-            if ($paymentMethodId !== null && $paymentMethodId !== '') {
-                $selectedPaymentMethods = session('selected_payment_methods', []);
-                $selectedPaymentMethods[$item->id] = $paymentMethodId;
-                session(['selected_payment_methods' => $selectedPaymentMethods]);
-            }
-        
-            return response()->json(['success' => true]);
-        }
+    public function savePaymentMethod(Request $request, $itemId) {
+        $request->validate([
+            'payment_method' => 'required|exists:payment_methods,id',
+        ]);
 
-        return view('purchases.create', compact('item', 'user', 'paymentMethods', 'purchase'));
+        session(['selected_payment_method_id' => $request->payment_method]);
+
+        return response()->json(['success' => true]);
     }
 
     public function purchase(PurchaseRequest $request, $itemId){

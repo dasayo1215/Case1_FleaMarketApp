@@ -34,6 +34,7 @@ Route::get('/item/{itemId}', [ItemController::class, 'show']);
 Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('/purchase/{itemId}', [PurchaseController::class, 'showPurchaseForm'])->name('purchase.show');
     Route::post('/purchase/{itemId}', [PurchaseController::class, 'purchase']);
+    Route::post('/purchase/{itemId}/payment-method', [PurchaseController::class, 'savePaymentMethod']);
     Route::get('/purchase/address/{itemId}', [PurchaseController::class, 'showAddressForm']);
     Route::post('/purchase/address/{itemId}', [PurchaseController::class, 'updateAddress']);
     Route::get('/sell', [ItemController::class, 'showSellForm'])->name('sell');
