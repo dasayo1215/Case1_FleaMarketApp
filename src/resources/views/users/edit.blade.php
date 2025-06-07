@@ -15,19 +15,6 @@
     <div class="content-wrapper">
         <h2 class="content-heading">プロフィール設定</h2>
         <div class="image-wrapper">
-            {{-- @php
-                $imagePath =
-                    old('profile_uploaded_image_path') ??
-                    ($user->image_filename ? 'users/' . $user->image_filename : null);
-            @endphp
-
-            @if ($imagePath)
-                <img id="profile-image" class="image-circle" src="{{ asset('storage/' . $imagePath) }}?v={{ time() }}"
-                    alt="プロフィール画像">
-            @else
-                <div class="image-circle" id="profile-image"></div>
-            @endif --}}
-
             @php
                 $imagePath =
                     old('profile_uploaded_image_path') ??
